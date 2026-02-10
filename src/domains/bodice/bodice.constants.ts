@@ -1,9 +1,9 @@
-import type { Point } from "../../drafting/geometry.types";
+import type { Point } from "../../geometry/geometry.types";
 import type { BodiceMeasurements } from "./bodice.types";
 
-export const ORIGIN: Point = { x: 0, y: 0 };
+export const ORIGIN = { x: 0, y: 0 } as const satisfies Point;
 
-export const ADDED_ARMSCYE_LENGTH = 0.5;
+export const ADDED_ARMSCYE_DEPTH = 0.5;
 
 export const WAIST_DART_DEPTH = 3;
 
