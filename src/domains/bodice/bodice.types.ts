@@ -1,4 +1,4 @@
-import type { Point } from "../../drafting/geometry.types";
+import type { Point } from "../../geometry/geometry.types";
 
 export type CircumferenceMeasurements = {
   bust: number; // measure at most voluminous part of bust
@@ -28,5 +28,32 @@ export type BodiceMeasurements = CircumferenceMeasurements &
   VerticalMeasurements &
   HorizontalMeasurements;
 
-// TODO: Decide whether to give points specific names using discriminated union
-export type BodicePatternPoints = Record<string, Point>;
+
+export type BasePoints = {
+  cfNeckline: Point;
+  cfWaistline: Point;
+};
+
+export type PrimaryPoints = {
+  cfArmscye: Point;
+  cfBust: Point;
+  lShoulder: Point;
+  sWaist: Point;
+  necklineStart: Point;
+  shoulderStart: Point;
+};
+
+export type SecondaryPoints = {
+  lShoulderSlope: Point;
+  sArmscye: Point;
+  sBust: Point;
+  armscyeStart: Point;
+};
+
+export type TertiaryPoints = {
+  armholeMidPoint: Point;
+};
+
+export type QuaternaryPoints = {
+  armholeDepth: Point;
+}
