@@ -1,3 +1,5 @@
+// TODO: Add unit tests for all helper functions
+
 import { expect, test } from "vitest";
 import { curvePoints, midPoint } from "./geometry.helpers";
 
@@ -7,7 +9,7 @@ test("midPoint: find the correct point in the middle of two points", () => {
 
   const middle = midPoint(pointA, pointB);
   expect(middle).toEqual({ x: 4.5, y: 4.5 });
-})
+});
 
 test("curvePoints", () => {
   const necklineStart = { x: 0, y: 5 };
