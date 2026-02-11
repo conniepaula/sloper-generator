@@ -15,7 +15,7 @@ export type VerticalMeasurements = {
 };
 
 export type HorizontalMeasurements = {
-  bustSpan: number; // measure from one bust apex to the other
+  apexToApex: number; // measure from one bust apex to the other
   shoulderLength: number; // measure from the neck to the shoulder point
   frontShoulderSpan: number; // measure from one shoulder point to the other at the front
   backShoulderSpan: number; // measure from one shoulder point to the other at the back (through cervical point)
@@ -41,6 +41,7 @@ export type PrimaryPoints = {
   sWaist: Point;
   necklineStart: Point;
   shoulderStart: Point;
+  waistDartCenter: Point;
 };
 
 export type SecondaryPoints = {
@@ -48,10 +49,16 @@ export type SecondaryPoints = {
   sArmscye: Point;
   sBust: Point;
   armscyeStart: Point;
+  waistDartOrigin: Point;
+  lWaistDart: Point;
+  rWaistDart: Point;
 };
 
 export type TertiaryPoints = {
   armholeMidPoint: Point;
+  bustDartOrigin: Point;
+  tBustDart: Point;
+  bBustDart: Point;
 };
 
 export type QuaternaryPoints = {

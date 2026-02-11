@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 
 import {
   armscyeLineHeight,
-  frontWaistLinePoints,
+  bodiceFrontStartingPoints,
   originToShoulderDistance,
   waistLineLength,
 } from "./bodice.helpers";
@@ -37,9 +37,9 @@ test("originToShoulderDistance: calculates correct distance from origin to shoul
   expect(distance).toBeCloseTo(6.52, 1);
 })
 
-test("frontWaistLinePoints: returns correct center front neckline and center front waist points", () => {
+test("bodiceFrontStartingPoints: returns correct center front neckline and center front waist points", () => {
   const frontWaistHeight = 40;
-  const points = frontWaistLinePoints(frontWaistHeight);
+  const points = bodiceFrontStartingPoints(frontWaistHeight);
 
   // Test assumes origin is (0, 0)
   expect(points.cfNeckline).toEqual({ x: 0, y: 0 });
