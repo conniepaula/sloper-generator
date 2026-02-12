@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# 🧵 Sloper Generator for Pattern Drafting (WIP)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a personal and experimental project for algorithmically drafting sewing pattern blocks/slopers.
 
-Currently, two official plugins are available:
+The goal is to translate traditional flat pattern drafting into pure geometric logic.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+With the help of this tool, beginner sewists can start working on their custom patterns without needing to build bodice blocks from scratch.
 
-## React Compiler
+This project is a work in progress.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# ✨ Why???
 
-## Expanding the ESLint configuration
+Since I started sewing my own clothes, many of my friends have asked me: "Can you **please** help me make something?"
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+However, the starting point for bespoke clothes is a paper sloper, and making those requires time, materials and multiple iterations, the first of which takes the longest.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+This project makes it easy for people to _just start_: input your measurements, print out your sloper and begin fitting it immediately.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# 👩🏼‍💻 Tech Stuff
+### Tools
+ - TypeScript
+- React with Vite
+- Tailwind
+- SVG
+- Vitest
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### How?
+
+To draft the patterns, I transformed my own real world pattern-making experience into code, using:
+
+  - Pure mathematical helpers to construct points, lines and vectors and perform explicit geometric transformations
+
+  - Pattern drafting helpers separated by drafting domain (bodice, skirt, sleeve, etc...) 
+
+  - SVG-based rendering
+
+### Running locally
+
+🚧 Keep in mind this project is very much under construction 🚧
+
+After cloning the repository, 
+
+```
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+`http://localhost:5173`
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Run tests with:
+
+`pnpm test`
+
+# ⌨️ Status
+
+### Currently working on:
+
+- Bodice sloper (female)
+- Dart folding / unfolding logic
+- Inputting custom measurements
+- Outputting A0 PDF file with correctly scaled pattern
+
+### Future Ideas
+- Add other slopers (skirt, trouser and sleeve)
+- Automatically split patterns into Letter/A4 so they can be printed at home
+- Allow users to perfect curves using anchor points or sliders
+- Add 3d model showing where to take each measurement using Three.js
+
+
+
+
+This is an experiment in combining patternmaking and computational geometry.
