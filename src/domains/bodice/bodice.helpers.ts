@@ -1,11 +1,13 @@
+import type { Line, Point, Ray } from "../../geometry/geometry.types";
 import {
   angleBetweenVectors,
-  intersectionOfLineAndRay,
+  midPoint,
   normalizeVector,
+  reflectPointOverLine,
   rotateAboutPoint,
   vectorFrom,
+  intersection,
 } from "../../geometry/geometry.helpers";
-import type { Line, Point, Ray } from "../../geometry/geometry.types";
 import {
   ADDED_ARMSCYE_DEPTH,
   ORIGIN,
@@ -13,6 +15,20 @@ import {
 } from "./bodice.constants";
 
 // TODO: Add docs to functions and write unit tests for functions that don't have them yet
+
+export const bustDartIntake = (
+  frontWaistHeight: number,
+  backWaistHeight: number,
+) => {
+  const dartDepth = frontWaistHeight - backWaistHeight;
+
+  // first iteration bodice should not have bust dart intake larger than 5
+  if (dartDepth > 5) {
+    return 5;
+  }
+
+  return dartDepth;
+};
 
 export const armscyeLineHeight = (frontWaistHeight: number) =>
   frontWaistHeight / 2 + ADDED_ARMSCYE_DEPTH;
@@ -40,30 +56,30 @@ export const bodiceFrontStartingPoints = (frontWaistHeight: number) => {
   };
 };
 
-export const bustDartVectorsAndRelations = (
-  bustDartOrigin: Point,
-  topDartEnd: Point,
-  bottomDartEnd: Point,
+export const getDartVectorsAndRelations = (
+  dartOrigin: Point,
+  stationaryDart: Point,
+  movableDart: Point,
 ) => {
-  const originalTopDartVector = normalizeVector(
-    vectorFrom(bustDartOrigin, topDartEnd),
+  const originalStationaryDartVector = normalizeVector(
+    vectorFrom(dartOrigin, stationaryDart),
   );
-  const originalBottomDartVector = normalizeVector(
-    vectorFrom(bustDartOrigin, bottomDartEnd),
+  const originalMovableDartVector = normalizeVector(
+    vectorFrom(dartOrigin, movableDart),
   );
   const angleBetweenDartVectors = angleBetweenVectors(
-    originalTopDartVector,
-    originalBottomDartVector,
+    originalStationaryDartVector,
+    originalMovableDartVector,
   );
 
   const foldBoundaryRay: Ray = {
-    origin: bustDartOrigin,
-    direction: originalTopDartVector,
+    origin: dartOrigin,
+    direction: originalStationaryDartVector,
   };
 
   return {
-    originalTopDartVector,
-    originalBottomDartVector,
+    originalStationaryDartVector,
+    originalMovableDartVector,
     angleBetweenDartVectors,
     foldBoundaryRay,
   };
@@ -90,7 +106,7 @@ export const unfoldBustDart = (
   angleBetweenDartVectors: number,
   foldBoundaryRay: Ray,
 ) => {
-  const splitPoint = intersectionOfLineAndRay(
+  const splitPoint = intersection.segmentRay(
     foldedSideSeamLine,
     foldBoundaryRay,
   );
@@ -130,5 +146,65 @@ export const unfoldBustDart = (
     bottomSideSeamSegment,
     topDartLegLine,
     bottomDartLegLine,
+  };
+};
+
+export const createDartBulk = (
+  origin: Point,
+  movableDart: Point,
+  stationaryDart: Point,
+  pointNextMovableDart: Point,
+) => {
+  // construct dart center line by connecting dart origin to midpoint between dart leg ends
+  const originalDartCenterLine = { from: origin, to: midPoint(movableDart, stationaryDart) };
+
+  const { angleBetweenDartVectors } = getDartVectorsAndRelations(
+    origin,
+    stationaryDart,
+    movableDart,
+  );
+
+  const rotatedLine = {
+    from: rotateAboutPoint(origin, movableDart, -angleBetweenDartVectors),
+    to: rotateAboutPoint(
+      origin,
+      pointNextMovableDart,
+      -angleBetweenDartVectors,
+    ),
+  };
+
+  // reflect line start and end over dartCenterLine to get second dart bulk
+  const reflectedLine = {
+    from: reflectPointOverLine(rotatedLine.to, originalDartCenterLine),
+    to: reflectPointOverLine(rotatedLine.from, originalDartCenterLine),
+  };
+
+  // find where dart bulk lines intersect to get where segment should end
+  const dartBulkIntersectionPoint = intersection.segmentSegment(
+    rotatedLine,
+    reflectedLine,
+  );
+
+  if (dartBulkIntersectionPoint === null) {
+    throw new Error("Dart bulk intersection not found.");
+  }
+
+  const stationaryDartBulkLine = {
+    from: stationaryDart,
+    to: dartBulkIntersectionPoint,
+  };
+  const movableDartBulkLine = {
+    from: movableDart,
+    to: dartBulkIntersectionPoint,
+  };
+
+  const dartCenterLine = {
+    from: origin, to: dartBulkIntersectionPoint
+  }
+
+  return {
+    dartCenterLine,
+    stationaryDartBulkLine,
+    movableDartBulkLine,
   };
 };

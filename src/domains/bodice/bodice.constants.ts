@@ -12,7 +12,7 @@ export const BUST_DART_HORIZONTAL_SHIFT = 3; // Usually 3cm for smaller sizes, 4
 export const MOCK_MEASUREMENTS: BodiceMeasurements = {
   bust: 90,
   waist: 72,
-  frontWaistHeight: 41,
+  frontWaistHeight: 42,
   backWaistHeight: 39,
   bustHeight: 25,
   centerFrontHeight: 34,
@@ -26,3 +26,21 @@ export const MOCK_MEASUREMENTS: BodiceMeasurements = {
   frontArmscyeToArmscye: 32,
   backArmscyeToArmscye: 35,
 };
+
+// export const MOCK_MEASUREMENTS: BodiceMeasurements = {
+//   bust: 80,
+//   waist: 82,
+//   frontWaistHeight: 48,
+//   backWaistHeight: 41,
+//   bustHeight: 27.5,
+//   centerFrontHeight: 37,
+//   centerBackHeight: 40,
+//   shoulderSlope: 4,
+//   shoulderLength: 13.5,
+//   apexToApex: 21,
+//   frontShoulderSpan: 39,
+//   backShoulderSpan: 42,
+//   bustFront: 52,
+//   frontArmscyeToArmscye: 35,
+//   backArmscyeToArmscye: 38,
+// };

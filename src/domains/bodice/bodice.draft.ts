@@ -1,10 +1,12 @@
 import {
   armscyeLineHeight as armscyeLineHeightFunc,
-  bustDartVectorsAndRelations,
+  bustDartIntake as bustDartIntakeFunc,
+  getDartVectorsAndRelations,
   foldBustDart,
   bodiceFrontStartingPoints,
   unfoldBustDart,
   waistLineLength,
+  createDartBulk,
 } from "./bodice.helpers";
 import type {
   BasePoints,
@@ -26,9 +28,11 @@ import {
 import { originToShoulderDistance } from "./bodice.helpers";
 import { AxisEnumMap, type Ray } from "../../geometry/geometry.types";
 
+const bustDartIntake = bustDartIntakeFunc(
+  m.frontWaistHeight,
+  m.backWaistHeight,
+);
 const armscyeLineHeight = armscyeLineHeightFunc(m.frontWaistHeight);
-
-const bustDartDepth = m.frontWaistHeight - m.backWaistHeight;
 
 export const basePoints: BasePoints = {
   ...bodiceFrontStartingPoints(m.frontWaistHeight),
@@ -76,8 +80,8 @@ const tertiaryPoints: TertiaryPoints = {
     secondaryPoints.lShoulderSlope,
     secondaryPoints.armscyeStart,
   ),
-  tBustDart: translatePoint(secondaryPoints.sBust, 0, -bustDartDepth / 2),
-  bBustDart: translatePoint(secondaryPoints.sBust, 0, bustDartDepth / 2),
+  tBustDart: translatePoint(secondaryPoints.sBust, 0, -bustDartIntake / 2),
+  bBustDart: translatePoint(secondaryPoints.sBust, 0, bustDartIntake / 2),
   bustDartOrigin: translatePoint(
     secondaryPoints.waistDartOrigin,
     BUST_DART_HORIZONTAL_SHIFT,
@@ -100,7 +104,7 @@ export const points = {
 };
 
 export const centerFrontLine = {
-  from: points.cfNeckline,
+  from: points.necklineStart, // to test, change to cfNeckline
   to: points.cfWaistline,
 };
 
@@ -111,7 +115,7 @@ export const armScyeLine = {
 
 export const bustLine = {
   from: points.cfBust,
-  to: points.sBust,
+  to: points.bustDartOrigin,
 };
 
 export const shoulderLine = {
@@ -122,6 +126,15 @@ export const shoulderLine = {
 export const waistLine = {
   from: points.cfWaistline,
   to: points.sWaist,
+};
+
+export const lWaistLine = {
+  from: points.lWaistDart,
+  to: points.sWaist,
+};
+export const rWaistLine = {
+  from: points.cfWaistline,
+  to: points.rWaistDart,
 };
 
 export const armScyeVerticalLine = {
@@ -146,12 +159,11 @@ export const lWaistDartLine = {
 
 /// BUST DART AND SIDE SEAM CONSTRUCTION
 
-const { foldBoundaryRay, angleBetweenDartVectors } =
-  bustDartVectorsAndRelations(
-    points.bustDartOrigin,
-    points.tBustDart,
-    points.bBustDart,
-  );
+const { foldBoundaryRay, angleBetweenDartVectors } = getDartVectorsAndRelations(
+  points.bustDartOrigin,
+  points.tBustDart,
+  points.bBustDart,
+);
 
 const foldedSideSeam = foldBustDart(
   points.bustDartOrigin,
@@ -196,3 +208,23 @@ export const armholeCurves = [
   shoulderToArmholeDepthCPoints,
   armholeDepthToArmscyeCPoints,
 ];
+
+///////////
+
+export const { movableDartBulkLine, stationaryDartBulkLine, dartCenterLine } =
+  createDartBulk(
+    points.waistDartOrigin,
+    points.rWaistDart,
+    points.lWaistDart,
+    points.cfWaistline,
+  );
+export const {
+  movableDartBulkLine: bustDartBulk1,
+  stationaryDartBulkLine: bustDartBulk2,
+  dartCenterLine: bustDartCenterLine,
+} = createDartBulk(
+  points.bustDartOrigin,
+  bottomDartLegLine.to,
+  topDartLegLine.to,
+  points.sWaist,
+);
