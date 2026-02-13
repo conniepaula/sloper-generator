@@ -1,21 +1,20 @@
 import {
   AxisEnumMap,
+  IntersectionRangeEnumMap,
   type CubicBezier,
   type CurveControl,
+  type Intersection,
+  type IntersectionType,
   type Line,
   type Point,
-  type Ray,
   type Vector,
 } from "./geometry.types";
 
 /**
- * Creates a vector from point1 to point2.
- * The resulting vector represents the displacement needed
- * to move from point1 to point2.
+ * Creates a vector from `point1` to `point2`.
  *
- * @param point1 The starting point.
- * @param point2 The ending point.
- * @returns A vector with x and y components (dx, dy).
+ * The resulting vector represents the displacement needed
+ * to move from `point1` to `point2`.
  */
 export const vectorFrom = (point1: Point, point2: Point): Vector => {
   const dx = point2.x - point1.x;
@@ -26,8 +25,6 @@ export const vectorFrom = (point1: Point, point2: Point): Vector => {
 
 /**
  * Computes the magnitude (length) of a vector.
- * The magnitude is defined as the Euclidean norm:
- * √(x² + y²).
  *
  * @param vector The vector whose length is being calculated.
  */
@@ -36,11 +33,8 @@ export const getMagnitude = (vector: Vector): number => {
 };
 
 /**
- * Normalizes a vector (scales it to unit length).
- * The resulting vector has magnitude 1 while preserving direction.
+ * Normalizes a vector.
  *
- * @param vector The vector to normalize.
- * @returns A unit vector pointing in the same direction.
  * @throws Error if the vector has zero magnitude.
  */
 export const normalizeVector = (vector: Vector): Vector => {
@@ -62,9 +56,6 @@ export const normalizeVector = (vector: Vector): Vector => {
  * - Testing orientation (clockwise vs counterclockwise)
  * - Detecting parallel vectors
  * - Computing intersections
- *
- * @param vector1 The first vector.
- * @param vector2 The second vector.
  */
 export const det2 = (vector1: Vector, vector2: Vector): number => {
   return vector1.x * vector2.y - vector1.y * vector2.x;
@@ -74,8 +65,6 @@ export const det2 = (vector1: Vector, vector2: Vector): number => {
  * Calculates the slope of the line defined by two points.
  * Slope is defined as rise over run (dy / dx).
  *
- * @param point1 The first point of the line.
- * @param point2 The second point of the line.
  * @throws Error if the line is vertical (dx = 0).
  */
 export const calculateSlope = (point1: Point, point2: Point): number => {
@@ -86,11 +75,26 @@ export const calculateSlope = (point1: Point, point2: Point): number => {
   return vector.y / vector.x;
 };
 
+export const getLineEquation = (line: Line) => {
+  const slope = calculateSlope(line.from, line.to);
+  const yIntercept = line.from.y - slope * line.from.x;
+
+  return { slope, yIntercept };
+};
+
+export const reflectPointOverLine = (point: Point, line: Line) => {
+  const orthogonalProjection = orthogonallyProjectPointOntoLine(point, line);
+
+  const reflectedPoint = {
+    x: 2 * orthogonalProjection.x - point.x,
+    y: 2 * orthogonalProjection.y - point.y,
+  };
+
+  return reflectedPoint;
+};
+
 /**
  * Calculates the dot product of two vectors.
- *
- * @param vector1 The first vector
- * @param vector2 The second vector
  */
 export const dotProduct = (vector1: Vector, vector2: Vector): number => {
   return vector1.x * vector2.x + vector1.y * vector2.y;
@@ -98,10 +102,7 @@ export const dotProduct = (vector1: Vector, vector2: Vector): number => {
 
 /**
  * Calculates the smallest angle between two vectors.
- * Uses the dot product to find the cosine of the angle, then applies arccosine to get the angle in radians.
  *
- * @param vector1 The first vector.
- * @param vector2 The second vector.
  * @returns The absolute angle between the two vectors in radians.
  * @throws Error if either vector has zero magnitude.
  */
@@ -119,64 +120,79 @@ export const angleBetweenVectors = (
   return Math.abs(angleInRadians);
 };
 
-/**
- * Computes the intersection point between a line segment
- * and a ray using their parametric forms.
- *
- * The line is treated as a finite segment between
- * line.from and line.to.
- * The ray is defined by an origin point and a direction vector,
- * extending infinitely in the positive direction.
- *
- * Returns null if:
- * - The line and ray are parallel (or nearly parallel),
- * - The intersection lies outside the line segment,
- * - The intersection lies behind the ray origin.
- *
- * @param line The line segment.
- * @param ray The ray (origin + direction).
- */
-export const intersectionOfLineAndRay = (
-  line: Line,
-  ray: Ray,
+const findIntersection = (
+  origin1: Point,
+  direction1: Vector,
+  type1: IntersectionType,
+  origin2: Point,
+  direction2: Vector,
+  type2: IntersectionType,
 ): Point | null => {
-  // parametric form of line: L(t) = line.from + t * vectorFromLine
-  // parametric form of ray: R(s) = ray.origin + s * ray.direction
+  // parametric form of line: L(t) = line.from + t * vectorFromLine = p + r * t
+  // parametric form of ray: R(s) = ray.origin + s * ray.direction = q + d * s
   // if there's an intersection, then L(t) = R(s) for some t and s >= 0
 
-  const p = line.from;
-  const r = vectorFrom(line.from, line.to);
-  const q = ray.origin;
-  const s = ray.direction;
+  const determinant = det2(direction1, direction2);
 
-  const rsDet = det2(r, s);
-
-  if (Math.abs(rsDet) < 1e-10) {
+  if (Math.abs(determinant) < 1e-10) {
     // lines are parallel or almost parallel, so no intersection
     return null;
   }
 
-  const qpMinus = vectorFrom(p, q);
+  const qpMinus = vectorFrom(origin1, origin2);
 
-  const t = det2(qpMinus, s) / rsDet;
-  const u = det2(qpMinus, r) / rsDet;
+  const t = det2(qpMinus, direction2) / determinant;
+  const s = det2(qpMinus, direction1) / determinant;
 
-  if (t < 0 || t > 1) return null; // point lies on segment
-  if (u < 0) return null; //point lies on ray
+  const intersectionRange1 = IntersectionRangeEnumMap[type1];
+  const intersectionRange2 = IntersectionRangeEnumMap[type2];
+
+  if (t < intersectionRange1.min || t > intersectionRange1.max) return null;
+  if (s < intersectionRange2.min || s > intersectionRange2.max) return null;
 
   return {
-    x: p.x + t * r.x,
-    y: p.y + t * r.y,
+    x: origin1.x + t * direction1.x,
+    y: origin1.y + t * direction1.y,
   };
+};
+
+/**
+ * Computes the intersection point between line segments
+ * and/or rays using their parametric forms.
+ */
+export const intersection: Intersection = {
+  segmentSegment(line1, line2) {
+    const p = line1.from;
+    const r = vectorFrom(line1.from, line1.to);
+    const q = line2.from;
+    const d = vectorFrom(line2.from, line2.to);
+
+    return findIntersection(p, r, "LINE", q, d, "LINE");
+  },
+
+  segmentRay(line, ray) {
+    const p = line.from;
+    const r = vectorFrom(line.from, line.to);
+    const q = ray.origin;
+    const d = ray.direction;
+
+    return findIntersection(p, r, "LINE", q, d, "RAY");
+  },
+
+  rayRay(ray1, ray2) {
+    const p = ray1.origin;
+    const r = ray2.direction;
+    const q = ray2.origin;
+    const d = ray2.direction;
+
+    return findIntersection(p, r, "RAY", q, d, "RAY");
+  },
 };
 
 /**
  * Rotates a point around a given center by a specified angle.
  * Uses standard 2D rotation matrix transformation.
  *
- * @param centerOfRotation The pivot point around which rotation occurs.
- * @param pointToRotate The point to rotate.
- * @param angleInRadians The rotation angle in radians (counterclockwise).
  */
 export const rotateAboutPoint = (
   centerOfRotation: Point,
@@ -205,8 +221,6 @@ export const rotateAboutPoint = (
 
 /**
  * Returns the midpoint between points two points.
- * @param a The first point.
- * @param b The second point.
  */
 export const midPoint = (a: Point, b: Point): Point => {
   const midX = (a.x + b.x) / 2;
@@ -215,6 +229,7 @@ export const midPoint = (a: Point, b: Point): Point => {
   return { x: midX, y: midY };
 };
 
+// TODO: Decide whether to do something similar to intersection and create 'drop', 'raise', 'square' etc
 /**
  * Translates a point by given distances in x and y directions.
  * @param point The first point.
@@ -243,8 +258,6 @@ export const translatePoint = (
  * parametric form. The target line is treated as infinite,
  * not clamped to a segment.
  *
- * @param point The point to project.
- * @param line The reference line used as the projection base.
  */
 export const orthogonallyProjectPointOntoLine = (
   point: Point,
