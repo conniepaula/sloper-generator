@@ -181,7 +181,7 @@ export const intersection: Intersection = {
 
   rayRay(ray1, ray2) {
     const p = ray1.origin;
-    const r = ray2.direction;
+    const r = ray1.direction;
     const q = ray2.origin;
     const d = ray2.direction;
 
