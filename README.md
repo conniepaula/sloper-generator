@@ -1,5 +1,7 @@
 # 🧵 Sloper Generator for Pattern Drafting (WIP)
 
+
+
 This is a personal and experimental project for algorithmically drafting sewing pattern blocks/slopers.
 
 The goal is to translate traditional flat pattern drafting into pure geometric logic.
@@ -34,6 +36,31 @@ To draft the patterns, I transformed my own real world pattern-making experience
 
   - SVG-based rendering
 
+# Usage example
+- Input data:
+```ts
+export const MOCK_MEASUREMENTS: BodiceMeasurements = {
+  bust: 90,
+  waist: 72,
+  frontWaistHeight: 42,
+  backWaistHeight: 39,
+  bustHeight: 25,
+  centerFrontHeight: 34,
+  centerBackHeight: 37,
+  shoulderSlope: 3.5,
+  shoulderLength: 12,
+  apexToApex: 18,
+  frontShoulderSpan: 36,
+  backShoulderSpan: 39,
+  bustFront: 46,
+  frontArmscyeToArmscye: 32,
+  backArmscyeToArmscye: 35,
+};
+```
+
+- Output:
+<img width="1225" height="1002" alt="image" src="https://github.com/user-attachments/assets/2255e3f4-3a6d-4ec1-96e6-fa461c8a46d2" />
+
 ### Running locally
 
 🚧 Keep in mind this project is very much under construction 🚧
@@ -57,13 +84,14 @@ Run tests with:
 
 ### Currently working on:
 
-- Bodice sloper (female)
-- Dart folding / unfolding logic
+- Bodice sloper (womens)
+- Improving curves
 - Inputting custom measurements
 - Outputting A0 PDF file with correctly scaled pattern
 
 ### Future Ideas
 - Add other slopers (skirt, trouser and sleeve)
+- Add mens sloper logic
 - Automatically split patterns into Letter/A4 so they can be printed at home
 - Allow users to perfect curves using anchor points or sliders
 - Add 3d model showing where to take each measurement using Three.js
