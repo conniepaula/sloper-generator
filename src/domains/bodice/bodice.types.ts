@@ -24,14 +24,14 @@ export type HorizontalMeasurements = {
   backArmscyeToArmscye: number; // measure from one armscye point to the other through the back
 };
 
-export type BodiceMeasurements = CircumferenceMeasurements &
-  VerticalMeasurements &
-  HorizontalMeasurements;
-
+export interface BodiceMeasurements
+  extends CircumferenceMeasurements,
+    VerticalMeasurements,
+    HorizontalMeasurements {}
 
 export type BasePoints = {
-  cfNeckline: Point;
-  cfWaistline: Point;
+  neckline: Point;
+  waistline: Point;
 };
 
 export type PrimaryPoints = {
@@ -63,4 +63,4 @@ export type TertiaryPoints = {
 
 export type QuaternaryPoints = {
   armholeDepth: Point;
-}
+};

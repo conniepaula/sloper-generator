@@ -11,11 +11,14 @@ import {
 import {
   ADDED_ARMSCYE_DEPTH,
   ORIGIN,
-  WAIST_DART_DEPTH,
+  FRONT_WAIST_DART_DEPTH,
 } from "./bodice.constants";
 
-// TODO: Add docs to functions and write unit tests for functions that don't have them yet
-
+// TODO: Add docs to functions
+/**
+ * Compute the bust dart intake (difference between front and back waist heights).
+ * Returns the raw difference but caps the intake at 5, as that's what's recommended for first iteration bodice slopers.
+ */
 export const bustDartIntake = (
   frontWaistHeight: number,
   backWaistHeight: number,
@@ -30,32 +33,56 @@ export const bustDartIntake = (
   return dartDepth;
 };
 
+
+/**
+ * Armscye line vertical position measured from origin.
+ * Uses half the front waist height plus a small added depth constant.
+ */
 export const armscyeLineHeight = (frontWaistHeight: number) =>
   frontWaistHeight / 2 + ADDED_ARMSCYE_DEPTH;
 
-export const waistLineLength = (waist: number) => waist / 4 + WAIST_DART_DEPTH;
+/**
+ * Calculates waistline length from waist measurement.
+ * Accounts for added waist dart depth.
+ */
+export const waistLineLength = (waist: number) =>
+  waist / 4 + FRONT_WAIST_DART_DEPTH;
 
+/**
+ * Computes horizontal distance from origin to the shoulder point.
+ * Uses the shoulder span, shoulder length and slope to compute the offset.
+ */
 export const originToShoulderDistance = (
-  frontShoulderSpan: number,
+  shoulderSpan: number,
   shoulderLength: number,
   shoulderSlope: number,
 ) => {
   return (
-    frontShoulderSpan / 2 -
+    shoulderSpan / 2 -
     Math.sqrt(Math.pow(shoulderLength, 2) - Math.pow(shoulderSlope, 2))
   );
 };
 
-export const bodiceFrontStartingPoints = (frontWaistHeight: number) => {
-  const cfNeckline = ORIGIN;
-  const cfWaistline: Point = { x: ORIGIN.x, y: ORIGIN.y + frontWaistHeight };
+
+/**
+ * Generic starting points for a bodice draft.
+ * `neckline` is at the origin; `waistline` is offset by `waistHeight`.
+ */
+export const bodiceStartingPoints = (waistHeight: number) => {
+  const neckline = ORIGIN;
+  const waistline: Point = { x: ORIGIN.x, y: ORIGIN.y + waistHeight };
 
   return {
-    cfNeckline,
-    cfWaistline,
+    neckline,
+    waistline,
   };
 };
 
+/**
+ * Computes normalized direction vectors for a dart and the geometric
+ * relationships needed to perform dart folding operations.
+ *
+ */
 export const getDartVectorsAndRelations = (
   dartOrigin: Point,
   stationaryDart: Point,
@@ -85,6 +112,10 @@ export const getDartVectorsAndRelations = (
   };
 };
 
+/**
+ * Simulates folding the bust dart: rotates the side waist point about the dart origin
+ * by the negative angle to produce the folded side seam.
+ */
 export const foldBustDart = (
   bustDartOrigin: Point,
   angleBetweenDartVectors: number,
@@ -149,6 +180,12 @@ export const unfoldBustDart = (
   };
 };
 
+/**
+ * Create dart bulk geometry from leg endpoints and a next-point helper.
+ * Reflects rotated lines to compute the intersection that defines bulk extent.
+ * Throws if the dart bulk intersection cannot be found.
+ */
+
 export const createDartBulk = (
   origin: Point,
   movableDart: Point,
@@ -156,7 +193,10 @@ export const createDartBulk = (
   pointNextMovableDart: Point,
 ) => {
   // construct dart center line by connecting dart origin to midpoint between dart leg ends
-  const originalDartCenterLine = { from: origin, to: midPoint(movableDart, stationaryDart) };
+  const originalDartCenterLine = {
+    from: origin,
+    to: midPoint(movableDart, stationaryDart),
+  };
 
   const { angleBetweenDartVectors } = getDartVectorsAndRelations(
     origin,
@@ -199,12 +239,64 @@ export const createDartBulk = (
   };
 
   const dartCenterLine = {
-    from: origin, to: dartBulkIntersectionPoint
-  }
+    from: origin,
+    to: dartBulkIntersectionPoint,
+  };
 
   return {
     dartCenterLine,
     stationaryDartBulkLine,
     movableDartBulkLine,
   };
+};
+
+/**
+ * Traces the back side seam from the waist up to the armscye.
+ *
+ * If the waist measurement is larger than the bust measurement
+ * (e.g. squarer body types), the side seam is drawn straight from the waist
+ * to a projection of the bust point onto the armscye line.
+ *
+ * Otherwise, the side seam is extended from the waist toward the bust,
+ * and its intersection with the armscye line determines the upper
+ * endpoint of the seam.
+ * 
+ * @throws If the side seam ray does not intersect the armscye line.
+ */
+export const traceBackSideSeam = (
+  backBust: Point,
+  backWaist: Point,
+  armscyeLine: Line,
+): Line => {
+  if (backWaist.x > backBust.x) {
+    // for 'squarer' body types, waist line might be larger than bust line
+    // if so, bust line measurement should be copied to armscye line and side seam traced from there
+    const bustMeasOnArmscyeLine = { x: backBust.x, y: armscyeLine.to.y };
+
+    return { from: backBust, to: bustMeasOnArmscyeLine };
+  }
+
+  const armScyeRay = {
+    origin: armscyeLine.from,
+    direction: vectorFrom(armscyeLine.from, armscyeLine.to),
+  };
+
+  const sideSeamRay = {
+    origin: backWaist,
+    direction: vectorFrom(backWaist, backBust),
+  };
+
+  // waist line is smaller than bust line
+  const armscyeSideSeamIntersection = intersection.rayRay(
+    sideSeamRay,
+    armScyeRay,
+  );
+
+  if (armscyeSideSeamIntersection === null) {
+    throw new Error(
+      "Back Bodice: Could not find intersection between side seam ray and armscye ray.",
+    );
+  }
+
+  return { from: backWaist, to: armscyeSideSeamIntersection };
 };
