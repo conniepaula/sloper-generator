@@ -30,9 +30,9 @@ export const MOCK_MEASUREMENTS: BodiceMeasurements = {
 };
 
 // export const MOCK_MEASUREMENTS: BodiceMeasurements = {
-//   bust: 80,
+//   bust: 100,
 //   waist: 82,
-//   frontWaistHeight: 48,
+//   frontWaistHeight: 43,
 //   backWaistHeight: 41,
 //   bustHeight: 27.5,
 //   centerFrontHeight: 37,

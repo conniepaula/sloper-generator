@@ -6,14 +6,15 @@ import {
   waistLineLength,
 } from "./bodice.helpers";
 import {
-  bustDartIntake,
-  bodiceStartingPoints,
+  calculateBustDartIntake,
+  createBaseCenterPoints,
   getDartVectorsAndRelations,
   foldBustDart,
   unfoldBustDart,
   traceBackSideSeam,
 } from "./bodice.helpers";
 import { rotateAboutPoint } from "../../geometry/geometry.helpers";
+import { FRONT_WAIST_DART_DEPTH } from "./bodice.constants";
 
 test("armscyeLineHeight: calculates correct armscye line height based on front waist height", () => {
   const frontWaistHeight = 40;
@@ -25,7 +26,7 @@ test("armscyeLineHeight: calculates correct armscye line height based on front w
 
 test("waistLineLength: calculates correct waist line length based on waist measurement", () => {
   const waist = 60;
-  const length = waistLineLength(waist);
+  const length = waistLineLength(waist, FRONT_WAIST_DART_DEPTH);
 
   // Test assumes FRONT_WAIST_DART_DEPTH is 3
   expect(length).toEqual(18);
@@ -43,22 +44,20 @@ test("originToShoulderDistance: calculates correct distance from origin to shoul
   );
 
   expect(distance).toBeCloseTo(6.52, 1);
-})
-
-
-test("bustDartIntake: returns capped value when difference > 5 and actual difference otherwise", () => {
-  expect(bustDartIntake(50, 40)).toEqual(5); // difference 10 -> cap 5
-  expect(bustDartIntake(45, 43)).toEqual(2); // difference 2 -> return 2
 });
 
-test("bodiceStartingPoints: returns neckline at origin and waistline at given height", () => {
-  const height = 40;
-  const pts = bodiceStartingPoints(height);
+test("calculateBustDartIntake: returns capped value when difference > 5 and actual difference otherwise", () => {
+  expect(calculateBustDartIntake(50, 40)).toEqual(5); // difference 10 -> cap 5
+  expect(calculateBustDartIntake(45, 43)).toEqual(2); // difference 2 -> return 2
+});
 
+test("createBaseCenterPoints: returns neckline at origin and waistline at given height", () => {
+  const height = 40;
+  const pts = createBaseCenterPoints(height);
 
   // Test assumes origin is (0, 0)
-  expect(pts.neckline).toEqual({ x: 0, y: 0 });
-  expect(pts.waistline).toEqual({ x: 0, y: 40 });
+  expect(pts.centerTop).toEqual({ x: 0, y: 0 });
+  expect(pts.centerBottom).toEqual({ x: 0, y: 40 });
 });
 
 test("getDartVectorsAndRelations: computes normalized vectors and angle between them", () => {
@@ -112,11 +111,16 @@ test("unfoldBustDart: unfolds folded side seam into dart legs and side seams", (
   // splitPoint is intersection at (2,0)
   const splitPoint = { x: 2, y: 0 };
 
-  expect(unfolded.topSideSeamSegment).toEqual({ from: armscyeEnd, to: splitPoint });
+  expect(unfolded.topSideSeamSegment).toEqual({
+    from: armscyeEnd,
+    to: splitPoint,
+  });
   expect(unfolded.topDartLegLine).toEqual({ from: bustOrigin, to: splitPoint });
 
   // bottom leg is rotation of splitPoint by angle about bustOrigin -> (0,2)
-  expect(unfolded.bottomDartLegLine.to).toEqual(rotateAboutPoint(bustOrigin, splitPoint, angle));
+  expect(unfolded.bottomDartLegLine.to).toEqual(
+    rotateAboutPoint(bustOrigin, splitPoint, angle),
+  );
 });
 
 test("traceBackSideSeam: when waist > bust, bust measurement is projected on armscye line and connected to waist to form side seam", () => {
@@ -126,7 +130,10 @@ test("traceBackSideSeam: when waist > bust, bust measurement is projected on arm
 
   const line = traceBackSideSeam(backBust, backWaist, armscyeLine);
 
-  expect(line).toEqual({ from: backBust, to: { x: backBust.x, y: armscyeLine.to.y } });
+  expect(line).toEqual({
+    from: backBust,
+    to: { x: backBust.x, y: armscyeLine.to.y },
+  });
 });
 
 test("traceBackSideSeam: when waist < bust, side seam starts and waist and ends when it intersects with armscye line, passing through bust point", () => {
