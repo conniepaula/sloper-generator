@@ -10,7 +10,7 @@ With the help of this tool, beginner sewists can start working on their custom p
 
 This project is a work in progress.
 
-# ✨ Why???
+# ✨ Why?
 
 Since I started sewing my own clothes, many of my friends have asked me: "Can you **please** help me make something?"
 
@@ -59,7 +59,8 @@ export const MOCK_MEASUREMENTS: BodiceMeasurements = {
 ```
 
 - Output:
-<img width="1225" height="1002" alt="image" src="https://github.com/user-attachments/assets/2255e3f4-3a6d-4ec1-96e6-fa461c8a46d2" />
+<img width="953" height="828" alt="image" src="https://github.com/user-attachments/assets/38ba5847-f77c-44bc-a00f-9e39452fe548" />
+
 
 ### Running locally
 
@@ -84,14 +85,14 @@ Run tests with:
 
 ### Currently working on:
 
-- Bodice sloper (womens)
+- Rendering layer
 - Improving curves
 - Inputting custom measurements
 - Outputting A0 PDF file with correctly scaled pattern
 
 ### Future Ideas
 - Add other slopers (skirt, trouser and sleeve)
-- Add mens sloper logic
+- Add mens bodice sloper logic
 - Automatically split patterns into Letter/A4 so they can be printed at home
 - Allow users to perfect curves using anchor points or sliders
 - Add 3d model showing where to take each measurement using Three.js
