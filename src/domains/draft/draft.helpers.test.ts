@@ -1,4 +1,4 @@
-import { assertType, expect, test } from "vitest";
+import { assertType, expect, expectTypeOf, test } from "vitest";
 
 import { addCurve, addLine } from "./draft.helpers";
 import type { DraftCurve, DraftLine } from "./draft.types";
@@ -13,7 +13,9 @@ test("addLine: function correctly adds line into context", () => {
   addLine(ctx, "front", "bust", line, { name: "Bust", role: "guide" });
 
   const frontBust = ctx.lines.front_bust;
+
   expect(frontBust).toBeDefined();
+  expectTypeOf(frontBust).toEqualTypeOf<DraftLine>();
   expect(frontBust).toMatchObject({
     geometry: { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } },
     role: "guide",
@@ -37,6 +39,7 @@ test("addCurve: function correctly adds curve into context", () => {
   const armhole = ctx.curves.back_armhole;
 
   expect(armhole).toBeDefined();
+  expectTypeOf(armhole).toEqualTypeOf<DraftCurve>();
   // role not added, should be default: "guide"
   expect(armhole).toMatchObject({
     geometry: curve,

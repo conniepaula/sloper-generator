@@ -13,6 +13,14 @@ type AddOptions = {
   name?: string;
 };
 
+/**
+ * Adds a `DraftLine` to the draft context.
+ *
+ * The line is stored under a piece-prefixed id (e.g. "front_centerFront").
+ * Metadata such as role and name are attached for later rendering/export.
+ *
+ * @param options - Optional metadata. Default values:  {role: "guide", name: ""}
+ */
 export const addLine = <
   TDraftContext extends { lines: Record<string, DraftLine> },
   TPiece extends Piece,
@@ -29,6 +37,14 @@ export const addLine = <
   ctx.lines[specificPieceId] = { geometry, role, piece, name };
 };
 
+/**
+ * Adds a cubic bezier curve to the draft context.
+ *
+ * The curve is stored under a piece-prefixed id (e.g. "back_armhole").
+ * Metadata such as role and name are attached for later rendering/export.
+ *
+ * @param options - Optional metadata. Default values:  {role: "guide", name: ""}
+ */
 export const addCurve = <
   TDraftContext extends { curves: Record<string, DraftCurve> },
   TPiece extends Piece,
