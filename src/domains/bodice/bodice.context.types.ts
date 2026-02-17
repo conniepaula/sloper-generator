@@ -1,4 +1,5 @@
 import type { CubicBezier, Line, Point } from "../../geometry/geometry.types";
+import type { DraftContextBase } from "../draft/draft.context.types";
 import type { BodiceMeasurements } from "./bodice.types";
 
 type BodicePoints =
@@ -73,13 +74,13 @@ type BodiceCurves =
   | "backNeckline"
   | "backArmholeDepthToArmscye";
 
-export type PointsRecord = Record<BodicePoints, Point>;
-export type LinesRecord = Record<BodiceLines, Line>;
-export type CurvesRecord = Record<BodiceCurves, CubicBezier>;
+export type BodiceDraftContext = DraftContextBase<
+  BodiceMeasurements,
+  BodicePoints,
+  BodiceLines,
+  BodiceCurves
+>;
 
-export type BodiceDraftContext = {
-  measurements: BodiceMeasurements;
-  points: PointsRecord;
-  lines: LinesRecord;
-  curves: CurvesRecord;
-};
+export type PointsRecord = BodiceDraftContext["points"];
+export type LinesRecord = BodiceDraftContext["lines"];
+export type CurvesRecord = BodiceDraftContext["curves"];
