@@ -6,6 +6,7 @@ import {
   midPoint,
   vectorFrom,
   getMagnitude,
+  lineLength,
   normalizeVector,
   det2,
   calculateSlope,
@@ -132,4 +133,12 @@ test("rotateAboutPoint and translatePoint: transform points", () => {
 
   const translated = translatePoint(point, 2, 3);
   expect(translated).toEqual({ x: 3, y: 3 });
+});
+
+test("lineLength: returns correct length for a line and zero length for identical points", () => {
+  const line = { from: { x: 0, y: 0 }, to: { x: 3, y: 4 } };
+  expect(lineLength(line)).toBeCloseTo(5);
+
+  const zero = { from: { x: 1, y: 1 }, to: { x: 1, y: 1 } };
+  expect(lineLength(zero)).toBeCloseTo(0);
 });

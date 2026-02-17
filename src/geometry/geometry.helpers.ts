@@ -244,6 +244,14 @@ export const translatePoint = (
   return { x: point.x + dx, y: point.y + dy };
 };
 
+/**
+ * Returns the Euclidean length of a line.
+ */
+export const lineLength = (line: Line): number => {
+  const v = vectorFrom(line.from, line.to);
+  return getMagnitude(v);
+};
+
 // TODO: Change orthogonallyProjectPointOntoLine into vector terms
 // Explore using orthogonal projection to 'square' points
 /**
