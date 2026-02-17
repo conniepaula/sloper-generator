@@ -24,11 +24,12 @@ import {
   unfoldBustDart,
   waistLineLength,
 } from "./bodice.helpers";
+import { addLine } from "../draft/draft.helpers";
 
 // DRAFTING STEPS - FRONT BODICE
 
 export const draftBaseFront = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   const base = createBaseCenterPoints(m.frontWaistHeight);
 
@@ -39,19 +40,33 @@ export const draftBaseFront = (ctx: BodiceDraftContext) => {
     waistLineLength(m.waist, FRONT_WAIST_DART_DEPTH),
   );
 
-  lines.front_centerFront = {
-    from: points.front_centerTop,
-    to: points.front_centerWaist,
-  };
+  // add center front guide
+  addLine(
+    ctx,
+    "front",
+    "centerFront",
+    {
+      from: points.front_centerTop,
+      to: points.front_centerWaist,
+    },
+    { name: "Center Front", role: "construction" },
+  );
 
-  lines.front_waistGuide = {
-    from: points.front_centerWaist,
-    to: points.front_sideWaist,
-  };
+  // add front waist guide
+  addLine(
+    ctx,
+    "front",
+    "waistGuide",
+    {
+      from: points.front_centerWaist,
+      to: points.front_sideWaist,
+    },
+    { name: "Waist Line", role: "construction" },
+  );
 };
 
 export const draftHelpersFront = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   // Armscye points
   const armscyeHeight = armscyeLineHeight(m.frontWaistHeight);
@@ -84,26 +99,44 @@ export const draftHelpersFront = (ctx: BodiceDraftContext) => {
   );
 
   // Armscye guide line
-  lines.front_armscyeGuide = {
-    from: points.front_centerArmscye,
-    to: points.front_sideArmscye,
-  };
+  addLine(
+    ctx,
+    "front",
+    "armscyeGuide",
+    {
+      from: points.front_centerArmscye,
+      to: points.front_sideArmscye,
+    },
+    { name: "Armscye Line", role: "guide" },
+  );
 
   // Bust guide line
-  lines.front_bustGuide = {
-    from: points.front_centerBust,
-    to: points.front_sideBust,
-  };
+  addLine(
+    ctx,
+    "front",
+    "bustGuide",
+    {
+      from: points.front_centerBust,
+      to: points.front_sideBust,
+    },
+    { name: "Bust Line", role: "guide" },
+  );
 
   // Shoulder guide line
-  lines.front_shoulderGuide = {
-    from: points.front_centerTop,
-    to: points.front_sideShoulder,
-  };
+  addLine(
+    ctx,
+    "front",
+    "shoulderGuide",
+    {
+      from: points.front_centerTop,
+      to: points.front_sideShoulder,
+    },
+    { name: "Shoulder Guide Line" },
+  );
 };
 
 export const draftShoulderFront = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   // Shoulder points
   points.front_innerShoulder = translatePoint(
@@ -122,15 +155,20 @@ export const draftShoulderFront = (ctx: BodiceDraftContext) => {
   );
 
   // Shoulder line
-
-  lines.front_shoulder = {
-    from: points.front_innerShoulder,
-    to: points.front_outerShoulder,
-  };
+  addLine(
+    ctx,
+    "front",
+    "shoulder",
+    {
+      from: points.front_innerShoulder,
+      to: points.front_outerShoulder,
+    },
+    { name: "Shoulder Line", role: "main_outer" },
+  );
 };
 
 export const draftNecklineFront = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines, curves } = ctx;
+  const { measurements: m, points } = ctx;
 
   const necklineHeight = m.frontWaistHeight - m.centerFrontHeight;
 
@@ -141,17 +179,24 @@ export const draftNecklineFront = (ctx: BodiceDraftContext) => {
     necklineHeight,
   );
 
+  // TODO: Write addCurve draft helper
   // Neckline curve
-  curves.front_neckline = curvePoints(
-    points.front_centerNeckline,
-    points.front_innerShoulder,
-  );
+  // curves.front_neckline = curvePoints(
+  //   points.front_centerNeckline,
+  //   points.front_innerShoulder,
+  // );
 
   // Center front neck to waist line
-  lines.front_centerNecklineToWaist = {
-    from: points.front_centerNeckline,
-    to: points.front_centerWaist,
-  };
+  addLine(
+    ctx,
+    "front",
+    "centerNecklineToWaist",
+    {
+      from: points.front_centerNeckline,
+      to: points.front_centerWaist,
+    },
+    { name: "Center Neck To Waistline", role: "main_outer" },
+  );
 };
 
 export const draftWaistFront = (ctx: BodiceDraftContext) => {
@@ -163,7 +208,7 @@ export const draftWaistFront = (ctx: BodiceDraftContext) => {
 
   const waistDartApexProjectionOnWaist = orthogonallyProjectPointOntoLine(
     points.front_waistDartApex,
-    lines.front_waistGuide,
+    lines.front_waistGuide.geometry,
   );
 
   const halfWaistDartDepth = FRONT_WAIST_DART_DEPTH / 2;
@@ -178,15 +223,27 @@ export const draftWaistFront = (ctx: BodiceDraftContext) => {
   );
 
   // Dart leg lines
+  addLine(
+    ctx,
+    "front",
+    "waistDartLeftLeg",
+    {
+      from: points.front_waistDartApex,
+      to: points.front_waistDartLeft,
+    },
+    { name: "Waist Dart: Left Leg", role: "main_inner" },
+  );
 
-  lines.front_waistDartLeftLeg = {
-    from: points.front_waistDartApex,
-    to: points.front_waistDartLeft,
-  };
-  lines.front_waistDartRightLeg = {
-    from: points.front_waistDartApex,
-    to: points.front_waistDartRight,
-  };
+  addLine(
+    ctx,
+    "front",
+    "waistDartRightLeg",
+    {
+      from: points.front_waistDartApex,
+      to: points.front_waistDartRight,
+    },
+    { name: "Waist Dart: Right Leg", role: "main_inner" },
+  );
 
   // Drafting dart bulk
 
@@ -198,9 +255,41 @@ export const draftWaistFront = (ctx: BodiceDraftContext) => {
       points.front_centerWaist,
     );
 
-  lines.front_waistDartBulkRight = movableDartBulkLine;
-  lines.front_waistDartBulkLeft = stationaryDartBulkLine;
-  lines.front_waistDartCenter = dartCenterLine;
+  addLine(ctx, "front", "waistDartBulkRight", movableDartBulkLine, {
+    name: "Waist Dart Bulk: Right Leg",
+    role: "main_outer",
+  });
+  addLine(ctx, "front", "waistDartBulkLeft", stationaryDartBulkLine, {
+    name: "Waist Dart Bulk: Right Leg",
+    role: "main_outer",
+  });
+
+  addLine(ctx, "front", "waistDartCenter", dartCenterLine, {
+    name: "Waist Dart Bulk: Right Leg",
+    role: "guide",
+  });
+
+  // Drafting waist line segments
+  addLine(
+    ctx,
+    "front",
+    "waistCenterToRightDartLeg",
+    { from: points.front_centerWaist, to: points.front_waistDartRight },
+    {
+      name: "Waist: Segment 1",
+      role: "main_outer",
+    },
+  );
+  addLine(
+    ctx,
+    "front",
+    "waistLeftDartLegToSideSeam",
+    { from: points.front_waistDartLeft, to: points.front_sideWaist },
+    {
+      name: "Waist: Segment 2",
+      role: "main_outer",
+    },
+  );
 };
 
 export const draftBustDartAndSideSeamFront = (ctx: BodiceDraftContext) => {
@@ -254,23 +343,44 @@ export const draftBustDartAndSideSeamFront = (ctx: BodiceDraftContext) => {
     foldBoundaryRay,
   );
 
-  lines.front_armscyeToBustDartSideSeam = topSideSeamSegment;
-  lines.front_bustDartToWaistSideSeam = bottomSideSeamSegment;
-  lines.front_bustDartTopLeg = topDartLegLine;
-  lines.front_bustDartBottomLeg = bottomDartLegLine;
+  addLine(ctx, "front", "armscyeToBustDartSideSeam", topSideSeamSegment, {
+    name: "Side Seam: Segment 1",
+    role: "main_outer",
+  });
+  addLine(ctx, "front", "bustDartToWaistSideSeam", bottomSideSeamSegment, {
+    name: "Side Seam: Segment 2",
+    role: "main_outer",
+  });
+  addLine(ctx, "front", "bustDartTopLeg", topDartLegLine, {
+    name: "Bust Dart: Top Leg",
+    role: "main_inner",
+  });
+  addLine(ctx, "front", "bustDartBottomLeg", bottomDartLegLine, {
+    name: "Bust Dart: Bottom Leg",
+    role: "main_inner",
+  });
 
   // Drafting bust dart bulk
   const { movableDartBulkLine, stationaryDartBulkLine, dartCenterLine } =
     createDartBulk(
       points.front_bustDartApex,
-      lines.front_bustDartBottomLeg.to,
-      lines.front_bustDartTopLeg.to,
+      lines.front_bustDartBottomLeg.geometry.to,
+      lines.front_bustDartTopLeg.geometry.to,
       points.front_sideWaist,
     );
 
-  lines.front_bustDartBulkBottom = movableDartBulkLine;
-  lines.front_bustDartBulkTop = stationaryDartBulkLine;
-  lines.front_bustDartCenter = dartCenterLine;
+  addLine(ctx, "front", "bustDartBulkBottom", movableDartBulkLine, {
+    name: "Bust Dart Bulk: Bottom Leg",
+    role: "main_outer",
+  });
+  addLine(ctx, "front", "bustDartBulkTop", stationaryDartBulkLine, {
+    name: "Bust Dart Bulk: Top Leg",
+    role: "main_outer",
+  });
+  addLine(ctx, "front", "bustDartCenter", dartCenterLine, {
+    name: "Bust Dart Bulk: Top Leg",
+    role: "guide",
+  });
 };
 
 export const draftArmholeFront = (ctx: BodiceDraftContext) => {
@@ -278,7 +388,7 @@ export const draftArmholeFront = (ctx: BodiceDraftContext) => {
 
   const outerShoulderProjectionOnArmscye = orthogonallyProjectPointOntoLine(
     points.front_outerShoulder,
-    lines.front_armscyeGuide,
+    lines.front_armscyeGuide.geometry,
   );
 
   // armhole points
@@ -311,7 +421,7 @@ export const draftArmholeFront = (ctx: BodiceDraftContext) => {
 // DRAFTING STEPS - BACK BODICE
 
 export const draftBaseBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   const base = createBaseCenterPoints(m.backWaistHeight);
 
@@ -322,19 +432,36 @@ export const draftBaseBack = (ctx: BodiceDraftContext) => {
     waistLineLength(m.waist, BACK_WAIST_DART_DEPTH),
   );
 
-  lines.back_centerBack = {
-    from: points.back_centerBackTop,
-    to: points.back_centerBackWaist,
-  };
-
-  lines.back_waistGuide = {
-    from: points.back_centerBackWaist,
-    to: points.back_sideWaist,
-  };
+  addLine(
+    ctx,
+    "back",
+    "centerBack",
+    {
+      from: points.back_centerBackTop,
+      to: points.back_centerBackWaist,
+    },
+    {
+      name: "Center Back",
+      role: "construction",
+    },
+  );
+  addLine(
+    ctx,
+    "back",
+    "waistGuide",
+    {
+      from: points.back_centerBackWaist,
+      to: points.back_sideWaist,
+    },
+    {
+      name: "Back Waist",
+      role: "construction",
+    },
+  );
 };
 
 export const draftHelpersBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   // Bust point
   // Bust line height is the same as in front bodice
@@ -348,20 +475,38 @@ export const draftHelpersBack = (ctx: BodiceDraftContext) => {
   );
 
   // Bust guide line
-  lines.back_bustGuide = {
-    from: points.front_centerBust,
-    to: points.back_sideBust,
-  };
+  addLine(
+    ctx,
+    "back",
+    "bustGuide",
+    {
+      from: points.front_centerBust,
+      to: points.back_sideBust,
+    },
+    {
+      name: "Bust Guide",
+      role: "guide",
+    },
+  );
 
   // Shoulder guide line
-  lines.back_shoulderGuide = {
-    from: points.back_centerBackTop,
-    to: points.back_sideShoulder,
-  };
+  addLine(
+    ctx,
+    "back",
+    "shoulderGuide",
+    {
+      from: points.back_centerBackTop,
+      to: points.back_sideShoulder,
+    },
+    {
+      name: "Shoulder Guide",
+      role: "construction",
+    },
+  );
 };
 
 export const draftShoulderBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines } = ctx;
+  const { measurements: m, points } = ctx;
 
   const halfShoulderSlope = m.shoulderSlope / 2;
 
@@ -383,14 +528,23 @@ export const draftShoulderBack = (ctx: BodiceDraftContext) => {
   );
 
   // shoulder line
-  lines.back_shoulder = {
-    from: points.back_innerShoulder,
-    to: points.back_outerShoulder,
-  };
+  addLine(
+    ctx,
+    "back",
+    "shoulder",
+    {
+      from: points.back_innerShoulder,
+      to: points.back_outerShoulder,
+    },
+    {
+      name: "Back Shoulder",
+      role: "main_outer",
+    },
+  );
 };
 
 export const draftNecklineBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines, curves } = ctx;
+  const { measurements: m, points } = ctx;
 
   const necklineHeight = m.backWaistHeight - m.centerBackHeight;
 
@@ -402,16 +556,25 @@ export const draftNecklineBack = (ctx: BodiceDraftContext) => {
   );
 
   // neckline curve
-  curves.back_neckline = curvePoints(
-    points.back_centerBackNeckline,
-    points.back_innerShoulder,
-  );
+  // curves.back_neckline = curvePoints(
+  //   points.back_centerBackNeckline,
+  //   points.back_innerShoulder,
+  // );
 
   // center back neckline to waist
-  lines.back_centerNecklineToWaist = {
-    from: points.back_centerBackNeckline,
-    to: points.back_centerBackWaist,
-  };
+  addLine(
+    ctx,
+    "back",
+    "centerNecklineToWaist",
+    {
+      from: points.back_centerBackNeckline,
+      to: points.back_centerBackWaist,
+    },
+    {
+      name: "Center Back",
+      role: "main_outer",
+    },
+  );
 };
 
 export const draftWaistBack = (ctx: BodiceDraftContext) => {
@@ -424,7 +587,7 @@ export const draftWaistBack = (ctx: BodiceDraftContext) => {
 
   points.back_waistDartApex = orthogonallyProjectPointOntoLine(
     waistHalfwayPoint,
-    lines.front_bustGuide,
+    lines.front_bustGuide.geometry,
   );
 
   const halfWaistDartDepth = BACK_WAIST_DART_DEPTH / 2;
@@ -439,15 +602,32 @@ export const draftWaistBack = (ctx: BodiceDraftContext) => {
   );
 
   // Dart leg lines
-
-  lines.back_waistDartLeftLeg = {
-    from: points.back_waistDartApex,
-    to: points.back_waistDartLeft,
-  };
-  lines.back_waistDartRightLeg = {
-    from: points.back_waistDartApex,
-    to: points.back_waistDartRight,
-  };
+  addLine(
+    ctx,
+    "back",
+    "waistDartLeftLeg",
+    {
+      from: points.back_waistDartApex,
+      to: points.back_waistDartLeft,
+    },
+    {
+      name: "Waist Dart: Left Leg",
+      role: "main_inner",
+    },
+  );
+  addLine(
+    ctx,
+    "back",
+    "waistDartRightLeg",
+    {
+      from: points.back_waistDartApex,
+      to: points.back_waistDartRight,
+    },
+    {
+      name: "Waist Dart: Right Leg",
+      role: "main_inner",
+    },
+  );
 
   // Drafting dart bulk
 
@@ -459,20 +639,57 @@ export const draftWaistBack = (ctx: BodiceDraftContext) => {
       points.back_centerBackWaist,
     );
 
-  lines.back_waistDartBulkRight = movableDartBulkLine;
-  lines.back_waistDartBulkLeft = stationaryDartBulkLine;
-  lines.back_waistDartCenter = dartCenterLine;
+  addLine(ctx, "back", "waistDartBulkRight", movableDartBulkLine, {
+    name: "Waist Dart Bulk: Right Leg",
+    role: "main_inner",
+  });
+  addLine(ctx, "back", "waistDartBulkLeft", stationaryDartBulkLine, {
+    name: "Waist Dart Bulk: Left Leg",
+    role: "main_inner",
+  });
+  addLine(ctx, "back", "waistDartCenter", dartCenterLine, {
+    name: "Waist Dart Bulk: Center Line",
+    role: "guide",
+  });
+
+  // Drafting waist line segments
+  addLine(
+    ctx,
+    "back",
+    "waistCenterToRightDartLeg",
+    { from: points.back_centerBackWaist, to: points.back_waistDartRight },
+    {
+      name: "Waist: Segment 1",
+      role: "main_outer",
+    },
+  );
+  addLine(
+    ctx,
+    "back",
+    "waistLeftDartLegToSideSeam",
+    { from: points.back_waistDartLeft, to: points.back_sideWaist },
+    {
+      name: "Waist: Segment 2",
+      role: "main_outer",
+    },
+  );
 };
 
 export const draftSideSeamBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines, curves } = ctx;
+  const { points, lines } = ctx;
 
   // front armscye guide line also serves as a guide line for back
-  lines.back_sideSeam = traceBackSideSeam(
+
+  const sideSeam = traceBackSideSeam(
     points.back_sideBust,
     points.back_sideWaist,
-    lines.front_armscyeGuide,
+    lines.front_armscyeGuide.geometry,
   );
+
+  addLine(ctx, "back", "sideSeam", sideSeam, {
+    name: "Side Seam",
+    role: "main_outer",
+  });
 };
 
 export const draftArmholeBack = (ctx: BodiceDraftContext) => {
@@ -480,7 +697,7 @@ export const draftArmholeBack = (ctx: BodiceDraftContext) => {
 
   const outerShoulderProjectedOnArmscye = orthogonallyProjectPointOntoLine(
     points.back_outerShoulder,
-    lines.front_armscyeGuide,
+    lines.front_armscyeGuide.geometry,
   );
 
   const armscyeMidPoint = midPoint(
@@ -495,17 +712,26 @@ export const draftArmholeBack = (ctx: BodiceDraftContext) => {
   );
 
   // armhole line from outer shoulder to armhole depth
-  lines.back_outerShoulderToArmscyeDepth = {
-    from: points.back_outerShoulder,
-    to: points.back_armholeDepth,
-  };
+  addLine(
+    ctx,
+    "back",
+    "outerShoulderToArmscyeDepth",
+    {
+      from: points.back_outerShoulder,
+      to: points.back_armholeDepth,
+    },
+    {
+      name: "Armhole: Segment 1",
+      role: "main_outer",
+    },
+  );
 
   // armhole curve from armhole depth to side armscye
   // TODO: Improve curves!
-  curves.back_armholeDepthToArmscye = curvePoints(
-    points.back_armholeDepth,
-    lines.back_sideSeam.to,
-    { axis: AxisEnumMap.VERTICAL, tension: 0.8 },
-    { axis: AxisEnumMap.HORIZONTAL, tension: 0.4 },
-  );
+  // curves.back_armholeDepthToArmscye = curvePoints(
+  //   points.back_armholeDepth,
+  //   lines.back_sideSeam.to,
+  //   { axis: AxisEnumMap.VERTICAL, tension: 0.8 },
+  //   { axis: AxisEnumMap.HORIZONTAL, tension: 0.4 },
+  // );
 };

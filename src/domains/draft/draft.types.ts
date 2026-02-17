@@ -5,40 +5,29 @@ import type {
 } from "../../geometry/geometry.types";
 
 export type Piece = "front" | "back";
-export type Role = "main" | "guide";
+export type Role = "main_outer" | "main_inner" | "guide" | "construction";
 
-export type DraftDocument = {
-  entities: Array<DraftEntity>;
-};
+interface DraftGeometryWrapper {
+  role: Role;
+  piece: Piece;
+  name: string;
+}
 
-export type DraftEntity = DraftLine | DraftCurve;
-
-export type DraftLine = {
-  id: string;
-  kind: "line";
+export interface DraftLine extends DraftGeometryWrapper {
   geometry: Line;
-  role: Role;
-  piece: Piece;
-  name: string;
-};
+}
 
-export type DraftCurve = {
-  id: string;
-  kind: "curve";
+export interface DraftCurve extends DraftGeometryWrapper {
   geometry: CubicBezier;
-  role: Role;
-  piece: Piece;
-  name: string;
-};
+}
 
-export type Draft<T extends DraftEntity> = {
-  id: string;
-  geometry: T;
-  kind: T extends CubicBezier ? "curve" : "line";
-  role: Role;
-  piece: Piece;
-  name: string;
-};
+interface LineEntity extends DraftLine {
+  kind: "line";
+}
+
+interface CurveEntity extends DraftCurve {
+  kind: "curve";
+}
 
 // export type DraftText = {
 //   id: string;
@@ -46,3 +35,17 @@ export type Draft<T extends DraftEntity> = {
 //   position: Point;
 //   value: string;
 // };
+
+export type DraftEntity = {
+  id: string;
+  exportable: boolean;
+} & (LineEntity | CurveEntity);
+
+export type DraftDocument = {
+  entities: Array<DraftEntity>;
+};
+
+export type WithoutPiecePrefix<
+  T extends string,
+  TPrefix extends Piece,
+> = T extends `${TPrefix}_${infer K}` ? K : never;

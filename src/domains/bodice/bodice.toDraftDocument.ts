@@ -7,13 +7,16 @@ export const bodiceContextToDraftDocument = (
   const { lines, curves } = ctx;
   const entities: Array<DraftEntity> = [];
 
-  Object.entries(lines).forEach(([id, geometry]) => {
-    // TODO: Add roles other than main for lines
-    entities.push({ id, kind: "line", geometry, role: "main" });
+  Object.entries(lines).forEach(([id, draftLine]) => {
+    // only main lines are exportable
+    const isExportable = draftLine.role !== "construction";
+
+    entities.push({ id, kind: "line", exportable: isExportable, ...draftLine });
   });
 
-  Object.entries(curves).forEach(([id, geometry]) => {
-    entities.push({ id, kind: "curve", geometry, role: "main" });
+  Object.entries(curves).forEach(([id, draftCurve]) => {
+    // all curves are exportable
+    entities.push({ id, kind: "curve", exportable: true, ...draftCurve });
   });
 
   return { entities };

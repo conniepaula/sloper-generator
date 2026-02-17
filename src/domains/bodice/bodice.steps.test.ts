@@ -47,8 +47,8 @@ test("front and back shoulder seams are of approximately equal length", () => {
   expect(frontShoulder).toBeDefined();
   expect(backShoulder).toBeDefined();
 
-  const frontLen = lineLength(frontShoulder);
-  const backLen = lineLength(backShoulder);
+  const frontLen = lineLength(frontShoulder.geometry);
+  const backLen = lineLength(backShoulder.geometry);
 
   const diff = Math.abs(frontLen - backLen);
 
@@ -57,7 +57,7 @@ test("front and back shoulder seams are of approximately equal length", () => {
 });
 
 test("side seam (front two segments) matches back side seam length", () => {
-  const ctx: any = {
+  const ctx: BodiceDraftContext = {
     measurements: MOCK_MEASUREMENTS,
     points: {},
     lines: {},
@@ -75,9 +75,9 @@ test("side seam (front two segments) matches back side seam length", () => {
   draftHelpersBack(ctx);
   draftSideSeamBack(ctx);
 
-  const seg1 = ctx.lines.front_armscyeToBustDartSideSeam;
-  const seg2 = ctx.lines.front_bustDartToWaistSideSeam;
-  const backSide = ctx.lines.back_sideSeam;
+  const seg1 = ctx.lines.front_armscyeToBustDartSideSeam.geometry;
+  const seg2 = ctx.lines.front_bustDartToWaistSideSeam.geometry;
+  const backSide = ctx.lines.back_sideSeam.geometry;
 
   expect(seg1).toBeDefined();
   expect(seg2).toBeDefined();

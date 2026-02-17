@@ -45,6 +45,8 @@ type BodiceLines =
   | "front_waistDartBulkRight"
   | "front_waistDartBulkLeft"
   | "front_waistDartCenter"
+  | "front_waistCenterToRightDartLeg"
+  | "front_waistLeftDartLegToSideSeam"
   | "front_armscyeToBustDartSideSeam"
   | "front_bustDartToWaistSideSeam"
   | "front_bustDartTopLeg"
@@ -63,6 +65,8 @@ type BodiceLines =
   | "back_waistDartBulkRight"
   | "back_waistDartBulkLeft"
   | "back_waistDartCenter"
+  | "back_waistCenterToRightDartLeg"
+  | "back_waistLeftDartLegToSideSeam"
   | "back_sideSeam"
   | "back_outerShoulderToArmscyeDepth";
 
