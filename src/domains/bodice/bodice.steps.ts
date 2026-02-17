@@ -24,7 +24,7 @@ import {
   unfoldBustDart,
   waistLineLength,
 } from "./bodice.helpers";
-import { addLine } from "../draft/draft.helpers";
+import { addCurve, addLine } from "../draft/draft.helpers";
 
 // DRAFTING STEPS - FRONT BODICE
 
@@ -179,12 +179,16 @@ export const draftNecklineFront = (ctx: BodiceDraftContext) => {
     necklineHeight,
   );
 
-  // TODO: Write addCurve draft helper
   // Neckline curve
-  // curves.front_neckline = curvePoints(
-  //   points.front_centerNeckline,
-  //   points.front_innerShoulder,
-  // );
+  const necklineCurve = curvePoints(
+    points.front_centerNeckline,
+    points.front_innerShoulder,
+  );
+
+  addCurve(ctx, "front", "neckline", necklineCurve, {
+    name: "Armhole: Segment 2",
+    role: "main_outer",
+  });
 
   // Center front neck to waist line
   addLine(
@@ -384,7 +388,7 @@ export const draftBustDartAndSideSeamFront = (ctx: BodiceDraftContext) => {
 };
 
 export const draftArmholeFront = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines, curves } = ctx;
+  const { measurements: m, points, lines } = ctx;
 
   const outerShoulderProjectionOnArmscye = orthogonallyProjectPointOntoLine(
     points.front_outerShoulder,
@@ -404,17 +408,29 @@ export const draftArmholeFront = (ctx: BodiceDraftContext) => {
   );
 
   // armhole curves
-  curves.front_shoulderToArmholeDepth = curvePoints(
+  const shoulderToArmholeDepth = curvePoints(
     points.front_outerShoulder,
     points.front_armholeDepth,
     { axis: AxisEnumMap.HORIZONTAL, tension: 0.05 },
   );
 
-  curves.front_armholeDepthToSideArmscye = curvePoints(
+  addCurve(ctx, "front", "shoulderToArmholeDepth", shoulderToArmholeDepth, {
+    name: "",
+    role: "main_outer",
+  });
+
+  const armholeDepthToSideArmscye = curvePoints(
     points.front_armholeDepth,
     points.front_sideArmscye,
     { axis: AxisEnumMap.VERTICAL, tension: 0.8 },
     { axis: AxisEnumMap.HORIZONTAL, tension: 0.3 },
+  );
+  addCurve(
+    ctx,
+    "front",
+    "armholeDepthToSideArmscye",
+    armholeDepthToSideArmscye,
+    { name: "", role: "main_outer" },
   );
 };
 
@@ -556,10 +572,15 @@ export const draftNecklineBack = (ctx: BodiceDraftContext) => {
   );
 
   // neckline curve
-  // curves.back_neckline = curvePoints(
-  //   points.back_centerBackNeckline,
-  //   points.back_innerShoulder,
-  // );
+  const necklineCurve = curvePoints(
+    points.back_centerBackNeckline,
+    points.back_innerShoulder,
+  );
+
+  addCurve(ctx, "back", "neckline", necklineCurve, {
+    name: "Neckline",
+    role: "main_outer",
+  });
 
   // center back neckline to waist
   addLine(
@@ -693,7 +714,7 @@ export const draftSideSeamBack = (ctx: BodiceDraftContext) => {
 };
 
 export const draftArmholeBack = (ctx: BodiceDraftContext) => {
-  const { measurements: m, points, lines, curves } = ctx;
+  const { measurements: m, points, lines } = ctx;
 
   const outerShoulderProjectedOnArmscye = orthogonallyProjectPointOntoLine(
     points.back_outerShoulder,
@@ -728,10 +749,15 @@ export const draftArmholeBack = (ctx: BodiceDraftContext) => {
 
   // armhole curve from armhole depth to side armscye
   // TODO: Improve curves!
-  // curves.back_armholeDepthToArmscye = curvePoints(
-  //   points.back_armholeDepth,
-  //   lines.back_sideSeam.to,
-  //   { axis: AxisEnumMap.VERTICAL, tension: 0.8 },
-  //   { axis: AxisEnumMap.HORIZONTAL, tension: 0.4 },
-  // );
+  const armholeDepthToArmscye = curvePoints(
+    points.back_armholeDepth,
+    lines.back_sideSeam.geometry.to,
+    { axis: AxisEnumMap.VERTICAL, tension: 0.8 },
+    { axis: AxisEnumMap.HORIZONTAL, tension: 0.4 },
+  );
+
+  addCurve(ctx, "back", "armholeDepthToArmscye", armholeDepthToArmscye, {
+    name: "Armhole: Segment 2",
+    role: "main_outer",
+  });
 };

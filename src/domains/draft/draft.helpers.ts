@@ -1,7 +1,14 @@
-import type { Line } from "../../geometry/geometry.types";
-import type { DraftLine, Piece, Role, WithoutPiecePrefix } from "./draft.types";
+import type { CubicBezier, Line } from "../../geometry/geometry.types";
+import type {
+  DraftCurve,
+  DraftLine,
+  Piece,
+  Role,
+  WithoutPiecePrefix,
+} from "./draft.types";
 
-type AddLineOptions = {
+// TODO: Once aanchor points can be altered, separate line and curve options
+type AddOptions = {
   role?: Role;
   name?: string;
 };
@@ -14,7 +21,7 @@ export const addLine = <
   piece: TPiece,
   id: WithoutPiecePrefix<Extract<keyof TDraftContext["lines"], string>, TPiece>,
   geometry: Line,
-  options: AddLineOptions,
+  options: AddOptions,
 ) => {
   const { role = "guide", name = "" } = options;
 
@@ -22,4 +29,21 @@ export const addLine = <
   ctx.lines[specificPieceId] = { geometry, role, piece, name };
 };
 
-// TODO: Define addCurve
+export const addCurve = <
+  TDraftContext extends { curves: Record<string, DraftCurve> },
+  TPiece extends Piece,
+>(
+  ctx: TDraftContext,
+  piece: TPiece,
+  id: WithoutPiecePrefix<
+    Extract<keyof TDraftContext["curves"], string>,
+    TPiece
+  >,
+  geometry: CubicBezier,
+  options: AddOptions,
+) => {
+  const { role = "guide", name = "" } = options;
+
+  const specificPieceId = `${piece}_${id}`;
+  ctx.curves[specificPieceId] = { geometry, role, piece, name };
+};
