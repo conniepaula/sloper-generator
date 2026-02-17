@@ -1,26 +1,33 @@
-import type { CubicBezier, Line, Point } from "../../geometry/geometry.types";
+import type {
+  CubicBezier,
+  Line,
+  // Point
+} from "../../geometry/geometry.types";
 
-export type DraftDocument = {
-  entities: Array<DraftEntity>;
-};
+export type Piece = "front" | "back";
+export type Role = "main_outer" | "main_inner" | "guide" | "construction";
 
-export type DraftEntity = DraftLine | DraftCurve;
+interface DraftGeometryWrapper {
+  role: Role;
+  piece: Piece;
+  name: string;
+}
 
-export type DraftLine = {
-  id: string;
-  kind: "line";
+export interface DraftLine extends DraftGeometryWrapper {
   geometry: Line;
-  role: "main" | "aux";
-  name?: string;
-};
+}
 
-export type DraftCurve = {
-  id: string;
-  kind: "curve";
+export interface DraftCurve extends DraftGeometryWrapper {
   geometry: CubicBezier;
-  role: "main" | "aux";
-  name?: string;
-};
+}
+
+interface LineEntity extends DraftLine {
+  kind: "line";
+}
+
+interface CurveEntity extends DraftCurve {
+  kind: "curve";
+}
 
 // export type DraftText = {
 //   id: string;
@@ -28,3 +35,17 @@ export type DraftCurve = {
 //   position: Point;
 //   value: string;
 // };
+
+export type DraftEntity = {
+  id: string;
+  exportable: boolean;
+} & (LineEntity | CurveEntity);
+
+export type DraftDocument = {
+  entities: Array<DraftEntity>;
+};
+
+export type WithoutPiecePrefix<
+  T extends string,
+  TPrefix extends Piece,
+> = T extends `${TPrefix}_${infer K}` ? K : never;

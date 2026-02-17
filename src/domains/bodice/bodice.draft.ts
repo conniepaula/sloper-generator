@@ -1,8 +1,6 @@
 import type { BodiceMeasurements } from "./bodice.types";
-import {
-  createBodiceDraftContext,
-  type BodiceDraftContext,
-} from "./bodice.context";
+import type { BodiceDraftContext } from "./bodice.context.types";
+import { createBodiceDraftContext } from "./bodice.context";
 import {
   draftArmholeBack,
   draftArmholeFront,
