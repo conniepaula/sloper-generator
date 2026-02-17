@@ -37,12 +37,12 @@ test("front and back shoulder seams are of approximately equal length", () => {
   draftShoulderFront(ctx);
 
   draftBaseBack(ctx);
-  // draftHelpersBack uses centerFrontBust which is added in draftHelpersFront
+  // draftHelpersBack uses front_centerBust which is added in draftHelpersFront
   draftHelpersBack(ctx);
   draftShoulderBack(ctx);
 
-  const frontShoulder = ctx.lines.frontShoulder;
-  const backShoulder = ctx.lines.backShoulder;
+  const frontShoulder = ctx.lines.front_shoulder;
+  const backShoulder = ctx.lines.back_shoulder;
 
   expect(frontShoulder).toBeDefined();
   expect(backShoulder).toBeDefined();
@@ -75,9 +75,9 @@ test("side seam (front two segments) matches back side seam length", () => {
   draftHelpersBack(ctx);
   draftSideSeamBack(ctx);
 
-  const seg1 = ctx.lines.armscyeToBustDartSideSeam;
-  const seg2 = ctx.lines.bustDartToWaistSideSeam;
-  const backSide = ctx.lines.backSideSeam;
+  const seg1 = ctx.lines.front_armscyeToBustDartSideSeam;
+  const seg2 = ctx.lines.front_bustDartToWaistSideSeam;
+  const backSide = ctx.lines.back_sideSeam;
 
   expect(seg1).toBeDefined();
   expect(seg2).toBeDefined();
