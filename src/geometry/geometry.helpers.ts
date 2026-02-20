@@ -1,6 +1,8 @@
+import type { NonEmptyArray } from "../core/assert";
 import {
   AxisEnumMap,
   IntersectionRangeEnumMap,
+  type BoundingBox,
   type CubicBezier,
   type CurveControl,
   type Intersection,
@@ -232,7 +234,7 @@ export const midPoint = (a: Point, b: Point): Point => {
 // TODO: Decide whether to do something similar to intersection and create 'drop', 'raise', 'square' etc
 /**
  * Translates a point by given distances in x and y directions.
- * @param point The first point.
+ * @param point The  point.
  * @param dx The horizontal translation distance.
  * @param dy The vertical translation distance.
  */
@@ -242,6 +244,42 @@ export const translatePoint = (
   dy: number = 0,
 ): Point => {
   return { x: point.x + dx, y: point.y + dy };
+};
+
+/**
+ * Translates a line by given distances in x and y directions.
+ * @param line The line.
+ * @param dx The horizontal translation distance.
+ * @param dy The vertical translation distance.
+ */
+export const translateLine = (
+  line: Line,
+  dx: number = 0,
+  dy: number = 0,
+): Line => {
+  return {
+    from: translatePoint(line.from, dx, dy),
+    to: translatePoint(line.to, dx, dy),
+  };
+};
+
+/**
+ * Translates a curve by given distances in x and y directions.
+ * @param line The curve (cubic bezier).
+ * @param dx The horizontal translation distance.
+ * @param dy The vertical translation distance.
+ */
+export const translateCurve = (
+  curve: CubicBezier,
+  dx: number = 0,
+  dy: number = 0,
+): CubicBezier => {
+  return {
+    start: translatePoint(curve.start, dx, dy),
+    end: translatePoint(curve.end, dx, dy),
+    control1: translatePoint(curve.control1, dx, dy),
+    control2: translatePoint(curve.control2, dx, dy),
+  };
 };
 
 /**
@@ -328,3 +366,21 @@ export const curvePoints = (
     end,
   };
 };
+// TOOD: Write DOCS and tests
+export function getBoundingBoxFromLines(
+  lines: NonEmptyArray<Line>,
+): BoundingBox {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const { from, to } of lines) {
+    minX = Math.min(minX, from.x, to.x);
+    maxX = Math.max(maxX, from.x, to.x);
+    minY = Math.min(minY, from.y, to.y);
+    maxY = Math.max(maxY, from.y, to.y);
+  }
+
+  return { minX, maxX, minY, maxY };
+}

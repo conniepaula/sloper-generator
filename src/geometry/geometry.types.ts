@@ -74,3 +74,10 @@ export type CurveControl = {
   axis: Axis;
   tension: number;
 };
+
+export type BoundingBox = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};

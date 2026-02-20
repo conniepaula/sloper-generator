@@ -41,7 +41,11 @@ export type DraftEntity = {
   exportable: boolean;
 } & (LineEntity | CurveEntity);
 
-export type DraftDocument = {
+export type RawEntities = Record<Piece, Array<DraftEntity>>;
+
+export type RawDraft = { rawEntities: RawEntities };
+
+export type ComposedDraftLayout = {
   entities: Array<DraftEntity>;
 };
 

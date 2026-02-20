@@ -1,6 +1,8 @@
+import { translateCurve, translateLine } from "../../geometry/geometry.helpers";
 import type { CubicBezier, Line } from "../../geometry/geometry.types";
 import type {
   DraftCurve,
+  DraftEntity,
   DraftLine,
   Piece,
   Role,
@@ -62,4 +64,31 @@ export const addCurve = <
 
   const specificPieceId = `${piece}_${id}`;
   ctx.curves[specificPieceId] = { geometry, role, piece, name };
+};
+
+export const extractLines = (entities: Array<DraftEntity>): Array<Line> => {
+  return entities.filter((e) => e.kind === "line").map((e) => e.geometry);
+};
+
+export const extractExportableLines = (
+  entities: Array<DraftEntity>,
+): Line[] => {
+  return entities
+    .filter(
+      (entity): entity is Extract<DraftEntity, { kind: "line" }> =>
+        entity.exportable && entity.kind === "line",
+    )
+    .map((entity) => entity.geometry);
+};
+
+export const translateEntity = (
+  entity: DraftEntity,
+  dx: number = 0,
+  dy: number = 0,
+): DraftEntity => {
+  if (entity.kind === "line") {
+    return { ...entity, geometry: translateLine(entity.geometry, dx, dy) };
+  }
+  // entity is curve
+  return { ...entity, geometry: translateCurve(entity.geometry, dx, dy) };
 };
