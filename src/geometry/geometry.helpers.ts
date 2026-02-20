@@ -366,7 +366,13 @@ export const curvePoints = (
     end,
   };
 };
-// TOOD: Write DOCS and tests
+/**
+ * Calculates the bounding box that encompasses all points in a collection of lines.
+ *
+ * @param lines Non-empty array of lines.
+ * @returns Bounding box with minX, maxX, minY, maxY coordinates.
+ * @throws When the array is empty (enforced by NonEmptyArray type).
+ */
 export function getBoundingBoxFromLines(
   lines: NonEmptyArray<Line>,
 ): BoundingBox {

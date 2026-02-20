@@ -1,7 +1,7 @@
 import { assertType, expect, expectTypeOf, test } from "vitest";
 
-import { addCurve, addLine } from "./draft.helpers";
-import type { DraftCurve, DraftLine } from "./draft.types";
+import { addCurve, addLine, extractLines, extractExportableLines, translateEntity } from "./draft.helpers";
+import type { DraftCurve, DraftLine, DraftEntity } from "./draft.types";
 import { curvePoints } from "../../geometry/geometry.helpers";
 
 test("addLine: function correctly adds line into context", () => {
@@ -51,4 +51,131 @@ test("addCurve: function correctly adds curve into context", () => {
   // type error when trying to create an id with the wrong piece type
   // @ts-expect-error "armhole" is not assignable to "neckline"
   assertType(addCurve(ctx, "front", "waist", curve, {}));
+});
+
+test("extractLines: extracts only line geometries from mixed entities", () => {
+  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+  const entities: DraftEntity[] = [
+    {
+      id: "front_line1",
+      kind: "line",
+      geometry: line1,
+      role: "guide",
+      piece: "front",
+      name: "Line 1",
+      exportable: true,
+    },
+    {
+      id: "front_curve1",
+      kind: "curve",
+      geometry: curve,
+      role: "main_outer",
+      piece: "front",
+      name: "Curve 1",
+      exportable: true,
+    },
+    {
+      id: "front_line2",
+      kind: "line",
+      geometry: line2,
+      role: "construction",
+      piece: "front",
+      name: "Line 2",
+      exportable: false,
+    },
+  ];
+
+  const lines = extractLines(entities);
+  expect(lines).toHaveLength(2);
+  expect(lines[0]).toEqual(line1);
+  expect(lines[1]).toEqual(line2);
+});
+
+test("extractExportableLines: extracts only exportable line geometries", () => {
+  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+  const entities: DraftEntity[] = [
+    {
+      id: "front_line1",
+      kind: "line",
+      geometry: line1,
+      role: "guide",
+      piece: "front",
+      name: "Line 1",
+      exportable: true,
+    },
+    {
+      id: "front_curve1",
+      kind: "curve",
+      geometry: curve,
+      role: "main_outer",
+      piece: "front",
+      name: "Curve 1",
+      exportable: true,
+    },
+    {
+      id: "front_line2",
+      kind: "line",
+      geometry: line2,
+      role: "construction",
+      piece: "front",
+      name: "Line 2",
+      exportable: false,
+    },
+  ];
+
+  const exportableLines = extractExportableLines(entities);
+  expect(exportableLines).toHaveLength(1);
+  expect(exportableLines[0]).toEqual(line1);
+});
+
+test("translateEntity: translates line geometry while preserving metadata", () => {
+  const line = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+  const entity: DraftEntity = {
+    id: "front_line1",
+    kind: "line",
+    geometry: line,
+    role: "guide",
+    piece: "front",
+    name: "Test Line",
+    exportable: true,
+  };
+
+  const translated = translateEntity(entity, 5, 3) as Extract<DraftEntity, { kind: "line" }>;
+
+  expect(translated.kind).toBe("line");
+  expect(translated.geometry).toEqual({
+    from: { x: 5, y: 3 },
+    to: { x: 6, y: 4 },
+  });
+  expect(translated.role).toBe("guide");
+  expect(translated.piece).toBe("front");
+  expect(translated.name).toBe("Test Line");
+});
+
+test("translateEntity: translates curve geometry while preserving metadata", () => {
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+  const entity: DraftEntity = {
+    id: "front_curve1",
+    kind: "curve",
+    geometry: curve,
+    role: "main_outer",
+    piece: "front",
+    name: "Test Curve",
+    exportable: true,
+  };
+
+  const translated = translateEntity(entity, 2, -1) as Extract<DraftEntity, { kind: "curve" }>;
+
+  expect(translated.kind).toBe("curve");
+  expect(translated.geometry.start).toEqual({ x: 2, y: -1 });
+  expect(translated.geometry.end).toEqual({ x: 7, y: 4 });
+  expect(translated.role).toBe("main_outer");
+  expect(translated.piece).toBe("front");
+  expect(translated.name).toBe("Test Curve");
 });

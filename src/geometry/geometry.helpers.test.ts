@@ -17,8 +17,12 @@ import {
   intersection,
   rotateAboutPoint,
   translatePoint,
+  translateLine,
+  translateCurve,
+  getBoundingBoxFromLines,
   orthogonallyProjectPointOntoLine,
 } from "./geometry.helpers";
+import { assertNonEmpty } from "../core/assert";
 
 test("midPoint: find the correct point in the middle of two points", () => {
   const pointA = { x: 3, y: 5 };
@@ -141,4 +145,95 @@ test("lineLength: returns correct length for a line and zero length for identica
 
   const zero = { from: { x: 1, y: 1 }, to: { x: 1, y: 1 } };
   expect(lineLength(zero)).toBeCloseTo(0);
+});
+
+test("translateLine: translates line endpoints by given distances", () => {
+  const line = { from: { x: 0, y: 0 }, to: { x: 2, y: 3 } };
+
+  const translated = translateLine(line, 5, -2);
+
+  expect(translated).toEqual({
+    from: { x: 5, y: -2 },
+    to: { x: 7, y: 1 },
+  });
+});
+
+test("translateLine: handles zero translation", () => {
+  const line = { from: { x: 1, y: 2 }, to: { x: 3, y: 4 } };
+
+  const translated = translateLine(line, 0, 0);
+
+  expect(translated).toEqual(line);
+});
+
+test("translateCurve: translates all control points by given distances", () => {
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+  const translated = translateCurve(curve, 3, 2);
+
+  expect(translated.start).toEqual({ x: 3, y: 2 });
+  expect(translated.end).toEqual({ x: 8, y: 7 });
+  expect(translated.control1.x).toBeCloseTo(curve.control1.x + 3);
+  expect(translated.control1.y).toBeCloseTo(curve.control1.y + 2);
+  expect(translated.control2.x).toBeCloseTo(curve.control2.x + 3);
+  expect(translated.control2.y).toBeCloseTo(curve.control2.y + 2);
+});
+
+test("translateCurve: handles negative translation", () => {
+  const curve = curvePoints({ x: 10, y: 10 }, { x: 15, y: 15 });
+
+  const translated = translateCurve(curve, -5, -10);
+
+  expect(translated.start).toEqual({ x: 5, y: 0 });
+  expect(translated.end).toEqual({ x: 10, y: 5 });
+});
+
+test("getBoundingBoxFromLines: calculates bounding box for single line", () => {
+  const lines = [{ from: { x: 2, y: 7 }, to: { x: 8, y: 3 } }];
+
+  assertNonEmpty(lines, "Empty line array.");
+
+  const bbox = getBoundingBoxFromLines(lines);
+
+  expect(bbox).toEqual({
+    minX: 2,
+    maxX: 8,
+    minY: 3,
+    maxY: 7,
+  });
+});
+
+test("getBoundingBoxFromLines: calculates bounding box for multiple lines", () => {
+  const lines = [
+    { from: { x: 0, y: 0 }, to: { x: 5, y: 5 } },
+    { from: { x: -2, y: 3 }, to: { x: 10, y: -1 } },
+    { from: { x: 7, y: 8 }, to: { x: 1, y: 2 } },
+  ];
+
+  assertNonEmpty(lines, "Empty line array.");
+  const bbox = getBoundingBoxFromLines(lines);
+
+  expect(bbox).toEqual({
+    minX: -2,
+    maxX: 10,
+    minY: -1,
+    maxY: 8,
+  });
+});
+
+test("getBoundingBoxFromLines: handles lines with identical endpoints", () => {
+  const lines = [
+    { from: { x: 3, y: 4 }, to: { x: 3, y: 4 } },
+    { from: { x: 1, y: 2 }, to: { x: 6, y: 5 } },
+  ];
+
+  assertNonEmpty(lines, "Empty line array.");
+  const bbox = getBoundingBoxFromLines(lines);
+
+  expect(bbox).toEqual({
+    minX: 1,
+    maxX: 6,
+    minY: 2,
+    maxY: 5,
+  });
 });

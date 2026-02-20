@@ -66,10 +66,23 @@ export const addCurve = <
   ctx.curves[specificPieceId] = { geometry, role, piece, name };
 };
 
+ /** Extracts line geometries from a collection of draft entities.
+ *
+ * @param entities Array of draft entities (lines and curves).
+ * @returns Array of Line geometries, excluding curves.
+ */
 export const extractLines = (entities: Array<DraftEntity>): Array<Line> => {
   return entities.filter((e) => e.kind === "line").map((e) => e.geometry);
 };
 
+/**
+ * Extracts exportable line geometries from a collection of draft entities.
+ *
+ * Only includes lines that have the `exportable` property set to true.
+ *
+ * @param entities Array of draft entities (lines and curves).
+ * @returns Array of Line geometries marked as exportable.
+ */
 export const extractExportableLines = (
   entities: Array<DraftEntity>,
 ): Line[] => {
@@ -81,6 +94,17 @@ export const extractExportableLines = (
     .map((entity) => entity.geometry);
 };
 
+/**
+ * Translates a draft entity (line or curve) by given distances.
+ *
+ * Preserves all metadata (role, piece, name, etc.) while updating
+ * the geometric coordinates.
+ *
+ * @param entity The draft entity to translate.
+ * @param dx The horizontal translation distance (default: 0).
+ * @param dy The vertical translation distance (default: 0).
+ * @returns A new entity with translated geometry.
+ */
 export const translateEntity = (
   entity: DraftEntity,
   dx: number = 0,
