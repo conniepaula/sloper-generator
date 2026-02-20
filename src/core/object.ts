@@ -1,5 +1,5 @@
-export function typedEntries<T extends Record<string, object>>(
+export function typedEntries<T extends Record<string, unknown>>(
   obj: T,
-): [keyof T, T[keyof T]][] {
-  return Object.entries(obj) as [keyof T, T[keyof T]][];
+): { [K in keyof T]: [K, T[K]] }[keyof T][] {
+  return Object.entries(obj) as any;
 }
