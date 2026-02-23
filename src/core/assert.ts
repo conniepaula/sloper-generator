@@ -1,3 +1,5 @@
+import { InvariantError } from "./errors";
+
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export function assertNonEmpty<T>(
@@ -5,6 +7,6 @@ export function assertNonEmpty<T>(
   message: string,
 ): asserts array is NonEmptyArray<T> {
   if (array.length === 0) {
-    throw new Error(message);
+    throw new InvariantError(message);
   }
 }

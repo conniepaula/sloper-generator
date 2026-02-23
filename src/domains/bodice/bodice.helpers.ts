@@ -8,10 +8,8 @@ import {
   vectorFrom,
   intersection,
 } from "../../geometry/geometry.helpers";
-import {
-  ADDED_ARMSCYE_DEPTH,
-  ORIGIN,
-} from "./bodice.constants";
+import { ADDED_ARMSCYE_DEPTH, ORIGIN } from "./bodice.constants";
+import { DomainError } from "../../core/errors";
 
 /**
  * Compute the bust dart intake (difference between front and back waist heights).
@@ -142,8 +140,8 @@ export const unfoldBustDart = (
   );
 
   if (splitPoint === null) {
-    throw new Error(
-      "Fold boundary ray does not intersect with folded side seam line",
+    throw new DomainError(
+      "Invalid dart geometry: Fold boundary ray does not intersect with folded side seam line.",
     );
   }
 
@@ -225,7 +223,9 @@ export const createDartBulk = (
   );
 
   if (dartBulkIntersectionPoint === null) {
-    throw new Error("Dart bulk intersection not found.");
+    throw new DomainError(
+      "Invalid bust dart geometry: Please check your measurements.",
+    );
   }
 
   const stationaryDartBulkLine = {
@@ -292,8 +292,8 @@ export const traceBackSideSeam = (
   );
 
   if (armscyeSideSeamIntersection === null) {
-    throw new Error(
-      "Back Bodice: Could not find intersection between side seam ray and armscye ray.",
+    throw new DomainError(
+      "Invalid side seam geometry: Could not find intersection between side seam ray and armscye ray.",
     );
   }
 

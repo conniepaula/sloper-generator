@@ -45,7 +45,7 @@ export type RawEntities = Record<Piece, Array<DraftEntity>>;
 
 export type RawDraft = { rawEntities: RawEntities };
 
-export type ComposedDraftLayout = {
+export type DraftDocument = {
   entities: Array<DraftEntity>;
 };
 

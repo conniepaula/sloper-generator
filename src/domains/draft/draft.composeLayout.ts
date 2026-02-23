@@ -1,12 +1,12 @@
 import { assertNonEmpty } from "../../core/assert";
 import { getBoundingBoxFromLines } from "../../geometry/geometry.helpers";
 import { extractExportableLines, translateEntity } from "./draft.helpers";
-import type { ComposedDraftLayout, RawDraft } from "./draft.types";
+import type { DraftDocument, RawDraft } from "./draft.types";
 
 export const composeDraftLayout = (
   rawDraft: RawDraft,
   spacing: number = 3,
-): ComposedDraftLayout => {
+): DraftDocument => {
   const { front, back } = rawDraft.rawEntities;
 
   // calculate x offset:
