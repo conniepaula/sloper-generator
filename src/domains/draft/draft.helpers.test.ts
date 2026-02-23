@@ -1,6 +1,14 @@
 import { assertType, expect, expectTypeOf, test } from "vitest";
 
-import { addCurve, addLine, extractLines, extractExportableLines, translateEntity } from "./draft.helpers";
+import {
+  addCurve,
+  addLine,
+  extractLines,
+  extractExportableLines,
+  translateEntity,
+  getSeamLength,
+  walkSeams,
+} from "./draft.helpers";
 import type { DraftCurve, DraftLine, DraftEntity } from "./draft.types";
 import { curvePoints } from "../../geometry/geometry.helpers";
 
@@ -146,7 +154,10 @@ test("translateEntity: translates line geometry while preserving metadata", () =
     exportable: true,
   };
 
-  const translated = translateEntity(entity, 5, 3) as Extract<DraftEntity, { kind: "line" }>;
+  const translated = translateEntity(entity, 5, 3) as Extract<
+    DraftEntity,
+    { kind: "line" }
+  >;
 
   expect(translated.kind).toBe("line");
   expect(translated.geometry).toEqual({
@@ -170,7 +181,10 @@ test("translateEntity: translates curve geometry while preserving metadata", () 
     exportable: true,
   };
 
-  const translated = translateEntity(entity, 2, -1) as Extract<DraftEntity, { kind: "curve" }>;
+  const translated = translateEntity(entity, 2, -1) as Extract<
+    DraftEntity,
+    { kind: "curve" }
+  >;
 
   expect(translated.kind).toBe("curve");
   expect(translated.geometry.start).toEqual({ x: 2, y: -1 });
@@ -178,4 +192,35 @@ test("translateEntity: translates curve geometry while preserving metadata", () 
   expect(translated.role).toBe("main_outer");
   expect(translated.piece).toBe("front");
   expect(translated.name).toBe("Test Curve");
+});
+
+test("getSeamLength: correctly gets seam length for seams with multiple segments (line array)", () => {
+  const seamArray = [
+    { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } },
+    { from: { x: -2, y: -2 }, to: { x: -1, y: -1 } },
+  ];
+
+  const result = getSeamLength(seamArray);
+  expect(result).toBeCloseTo(2.828);
+});
+
+test("getSeamLength: correctly gets seam length for seams with a single segment (line)", () => {
+  const seam = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+
+  const result = getSeamLength(seam);
+  expect(result).toBeCloseTo(1.414);
+});
+
+test("walkSeams: not throw  when seams are  of equal length", () => {
+  const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
+  const seam2 = { from: { x: 2, y: 2 }, to: { x: 1, y: 1 } };
+
+  expect(() => walkSeams(seam1, seam2)).not.toThrow();
+});
+
+test("walkSeams: throw when seams are not of equal length", () => {
+  const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
+  const seam2 = { from: { x: 0, y: 0 }, to: { x: 10, y: 10 } };
+
+  expect(() => walkSeams(seam1, seam2)).toThrow();
 });

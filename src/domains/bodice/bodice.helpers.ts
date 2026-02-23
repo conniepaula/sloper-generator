@@ -10,6 +10,7 @@ import {
 } from "../../geometry/geometry.helpers";
 import { ADDED_ARMSCYE_DEPTH, ORIGIN } from "./bodice.constants";
 import { DomainError } from "../../core/errors";
+import { BodiceError } from "./bodice.errors";
 
 /**
  * Compute the bust dart intake (difference between front and back waist heights).
@@ -140,8 +141,9 @@ export const unfoldBustDart = (
   );
 
   if (splitPoint === null) {
-    throw new DomainError(
+    throw new BodiceError(
       "Invalid dart geometry: Fold boundary ray does not intersect with folded side seam line.",
+      "draftBustDartAndSideSeamFront",
     );
   }
 
@@ -223,8 +225,9 @@ export const createDartBulk = (
   );
 
   if (dartBulkIntersectionPoint === null) {
-    throw new DomainError(
+    throw new BodiceError(
       "Invalid bust dart geometry: Please check your measurements.",
+      "draftBustDartAndSideSeamFront",
     );
   }
 
@@ -292,8 +295,9 @@ export const traceBackSideSeam = (
   );
 
   if (armscyeSideSeamIntersection === null) {
-    throw new DomainError(
+    throw new BodiceError(
       "Invalid side seam geometry: Could not find intersection between side seam ray and armscye ray.",
+      "draftSideSeamBack",
     );
   }
 

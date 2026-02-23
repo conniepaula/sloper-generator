@@ -1,4 +1,9 @@
-import { translateCurve, translateLine } from "../../geometry/geometry.helpers";
+import { DomainError, type DomainName } from "../../core/errors";
+import {
+  lineLength,
+  translateCurve,
+  translateLine,
+} from "../../geometry/geometry.helpers";
 import type { CubicBezier, Line } from "../../geometry/geometry.types";
 import type {
   DraftCurve,
@@ -6,6 +11,7 @@ import type {
   DraftLine,
   Piece,
   Role,
+  Seam,
   WithoutPiecePrefix,
 } from "./draft.types";
 
@@ -66,7 +72,7 @@ export const addCurve = <
   ctx.curves[specificPieceId] = { geometry, role, piece, name };
 };
 
- /** Extracts line geometries from a collection of draft entities.
+/** Extracts line geometries from a collection of draft entities.
  *
  * @param entities Array of draft entities (lines and curves).
  * @returns Array of Line geometries, excluding curves.
@@ -115,4 +121,77 @@ export const translateEntity = (
   }
   // entity is curve
   return { ...entity, geometry: translateCurve(entity.geometry, dx, dy) };
+};
+
+/**
+ * Calculates the sum of the length of all the lines in a line array.
+ */
+export const getLineArrayLength = (lineArray: Array<Line>): number => {
+  if (lineArray.length === 0) {
+    return 0;
+  }
+
+  let lineArrayLength = 0;
+
+  lineArray.map((line) => {
+    lineArrayLength += lineLength(line);
+  });
+
+  return lineArrayLength;
+};
+
+/**
+ * Calculates the length of a single or segmented seam.
+ *
+ * @param seam Line or line array
+ */
+export const getSeamLength = (seam: Seam) => {
+  const isSeamArray = Array.isArray(seam);
+  let seamLength = 0;
+  if (isSeamArray) {
+    seamLength = getLineArrayLength(seam);
+  } else {
+    seamLength = lineLength(seam);
+  }
+
+  return seamLength;
+};
+
+interface WalkSeamsOpts {
+  diff?: number;
+  errorMessage?: string;
+  domain?: DomainName;
+  details?: string;
+}
+
+/**
+ * Walks seams to ensure pattern correctness.
+ *
+ * When sewing one seam to another, they must be the same length. Checking this is called 'walking seams',
+ * hence the name of the function.
+ *
+ * @param seam1 Seam
+ * @param seam2 Seam
+ * @param opts Optional parameter. Defaults to diff = 0.3, domain = "draft".
+ * @returns A new entity with translated geometry.
+ */
+export const walkSeams = (
+  seam1: Seam,
+  seam2: Seam,
+  opts: WalkSeamsOpts = {},
+) => {
+  const {
+    diff = 0.3,
+    errorMessage = "Seam lengths too different. Check your measurements",
+    domain = "draft",
+    details = "",
+  } = opts;
+  const seam1Length = getSeamLength(seam1);
+  const seam2Length = getSeamLength(seam2);
+
+  const seamDiff = Math.abs(seam2Length - seam1Length);
+
+  if (seamDiff > diff) {
+    throw new DomainError(errorMessage, domain, details);
+  }
 };
