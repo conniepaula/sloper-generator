@@ -131,7 +131,7 @@ export const draftHelpersFront = (ctx: BodiceDraftContext) => {
       from: points.front_centerTop,
       to: points.front_sideShoulder,
     },
-    { name: "Shoulder Guide Line" },
+    { name: "Shoulder Guide Line", role: "construction" },
   );
 };
 

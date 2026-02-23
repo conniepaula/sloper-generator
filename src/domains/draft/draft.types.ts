@@ -6,6 +6,7 @@ import type {
 
 export type Piece = "front" | "back";
 export type Role = "main_outer" | "main_inner" | "guide" | "construction";
+export type Seam = Line | Array<Line>;
 
 interface DraftGeometryWrapper {
   role: Role;
@@ -45,7 +46,7 @@ export type RawEntities = Record<Piece, Array<DraftEntity>>;
 
 export type RawDraft = { rawEntities: RawEntities };
 
-export type ComposedDraftLayout = {
+export type DraftDocument = {
   entities: Array<DraftEntity>;
 };
 

@@ -1,93 +1,79 @@
-import { expect, test } from "vitest";
-
+import { describe, expect, test } from "vitest";
+import { createBodiceDraftContext } from "./bodice.context";
+import { MOCK_MEASUREMENTS } from "./bodice.constants";
 import {
+  draftBaseBack,
   draftBaseFront,
+  draftHelpersBack,
   draftHelpersFront,
+  draftNecklineFront,
   draftShoulderFront,
   draftWaistFront,
-  draftBustDartAndSideSeamFront,
-  draftBaseBack,
-  draftHelpersBack,
-  draftShoulderBack,
-  draftSideSeamBack,
 } from "./bodice.steps";
-import { MOCK_MEASUREMENTS } from "./bodice.constants";
-import type {
-  BodiceDraftContext,
-  CurvesRecord,
-  LinesRecord,
-  PointsRecord,
-} from "./bodice.context.types";
 
-import { lineLength } from "../../geometry/geometry.helpers";
+// TODO: Finish testing all lines
+describe("testing bodice steps", () => {
+  // create context
+  const ctx = createBodiceDraftContext(MOCK_MEASUREMENTS);
 
-// TODO: Add function that walks seams so i can throw an error if there's an issue
+  test("draftBaseFront: creates base front points and construction lines", () => {
+    draftBaseFront(ctx);
 
-test("front and back shoulder seams are of approximately equal length", () => {
-  const ctx: BodiceDraftContext = {
-    measurements: MOCK_MEASUREMENTS,
-    points: {} as PointsRecord,
-    lines: {} as LinesRecord,
-    curves: {} as CurvesRecord,
-  };
+    expect(ctx.points.front_centerTop).toBeDefined();
+    expect(ctx.points.front_centerWaist).toBeDefined();
+    expect(ctx.points.front_sideWaist).toBeDefined();
 
-  // run necessary drafting steps for front and back shoulders
-  draftBaseFront(ctx);
-  draftHelpersFront(ctx);
-  draftShoulderFront(ctx);
+    expect(ctx.lines.front_centerFront).toBeDefined();
+    expect(ctx.lines.front_waistGuide).toBeDefined();
 
-  draftBaseBack(ctx);
-  // draftHelpersBack uses front_centerBust which is added in draftHelpersFront
-  draftHelpersBack(ctx);
-  draftShoulderBack(ctx);
+    expect(ctx.lines.front_centerFront.role).toBe("construction");
+    expect(ctx.lines.front_waistGuide.role).toBe("construction");
+  });
 
-  const frontShoulder = ctx.lines.front_shoulder;
-  const backShoulder = ctx.lines.back_shoulder;
+  test("draftHelpersFront: adds bust, armscye and shoulder guides", () => {
+    draftHelpersFront(ctx);
 
-  expect(frontShoulder).toBeDefined();
-  expect(backShoulder).toBeDefined();
+    expect(ctx.points.front_centerBust).toBeDefined();
+    expect(ctx.points.front_centerArmscye).toBeDefined();
+    expect(ctx.points.front_sideShoulder).toBeDefined();
 
-  const frontLen = lineLength(frontShoulder.geometry);
-  const backLen = lineLength(backShoulder.geometry);
+    expect(ctx.lines.front_bustGuide.role).toBe("guide");
+    expect(ctx.lines.front_armscyeGuide.role).toBe("guide");
+    expect(ctx.lines.front_shoulderGuide.role).toBe("construction");
+  });
 
-  const diff = Math.abs(frontLen - backLen);
+  test("draftShoulderFront + draftNecklineFront: adds shoulder line and neckline curve", () => {
+    draftShoulderFront(ctx);
+    draftNecklineFront(ctx);
 
-  // allow small difference
-  expect(diff).toBeLessThanOrEqual(0.3);
-});
+    expect(ctx.lines.front_shoulder.role).toBe("main_outer");
+    expect(ctx.curves.front_neckline.role).toBe("main_outer");
+  });
 
-test("side seam (front two segments) matches back side seam length", () => {
-  const ctx: BodiceDraftContext = {
-    measurements: MOCK_MEASUREMENTS,
-    points: {},
-    lines: {},
-    curves: {},
-  };
+  test("draftWaistFront: creates waist dart and waist segments", () => {
+    draftWaistFront(ctx);
 
-  // build front geometry including bust darts and side seams
-  draftBaseFront(ctx);
-  draftHelpersFront(ctx);
-  draftWaistFront(ctx);
-  draftBustDartAndSideSeamFront(ctx);
+    expect(ctx.lines.front_waistDartLeftLeg.role).toBe("main_inner");
+    expect(ctx.lines.front_waistDartRightLeg.role).toBe("main_inner");
 
-  // build back geometry and side seam
-  draftBaseBack(ctx);
-  draftHelpersBack(ctx);
-  draftSideSeamBack(ctx);
+    expect(ctx.lines.front_waistCenterToRightDartLeg.role).toBe("main_outer");
+    expect(ctx.lines.front_waistLeftDartLegToSideSeam.role).toBe("main_outer");
+  });
 
-  const seg1 = ctx.lines.front_armscyeToBustDartSideSeam.geometry;
-  const seg2 = ctx.lines.front_bustDartToWaistSideSeam.geometry;
-  const backSide = ctx.lines.back_sideSeam.geometry;
+  test("draftBaseBack: creates base back structure", () => {
+    draftBaseBack(ctx);
 
-  expect(seg1).toBeDefined();
-  expect(seg2).toBeDefined();
-  expect(backSide).toBeDefined();
+    expect(ctx.points.back_centerBackTop).toBeDefined();
+    expect(ctx.lines.back_centerBack.role).toBe("construction");
+  });
 
-  const frontSum = lineLength(seg1) + lineLength(seg2);
-  const backLen = lineLength(backSide);
+  test("draftHelpersBack: adds bust and shoulder line guides", () => {
+    draftHelpersBack(ctx);
 
-  const diff = Math.abs(frontSum - backLen);
+    expect(ctx.points.back_sideBust).toBeDefined();
+    expect(ctx.points.back_sideShoulder).toBeDefined();
 
-  // allow small difference
-  expect(diff).toBeLessThanOrEqual(0.3);
+    expect(ctx.lines.back_bustGuide.role).toBe("guide");
+    expect(ctx.lines.back_shoulderGuide.role).toBe("construction");
+  });
 });

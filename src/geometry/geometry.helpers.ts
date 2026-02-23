@@ -1,4 +1,5 @@
 import type { NonEmptyArray } from "../core/assert";
+import { InvariantError } from "../core/errors";
 import {
   AxisEnumMap,
   IntersectionRangeEnumMap,
@@ -42,7 +43,7 @@ export const getMagnitude = (vector: Vector): number => {
 export const normalizeVector = (vector: Vector): Vector => {
   const magnitude = getMagnitude(vector);
   if (magnitude === 0) {
-    throw new Error("Cannot normalize a zero vector.");
+    throw new InvariantError("Cannot normalize a zero vector.");
   }
   const normalizedVector = { x: vector.x / magnitude, y: vector.y / magnitude };
 
@@ -72,7 +73,7 @@ export const det2 = (vector1: Vector, vector2: Vector): number => {
 export const calculateSlope = (point1: Point, point2: Point): number => {
   const vector = vectorFrom(point1, point2);
   if (vector.x === 0) {
-    throw new Error("Slope is undefined for vertical lines.");
+    throw new InvariantError("Slope is undefined for vertical lines.");
   }
   return vector.y / vector.x;
 };
