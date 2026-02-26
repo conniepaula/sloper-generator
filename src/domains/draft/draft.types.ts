@@ -1,4 +1,5 @@
 import type {
+  BoundingBox,
   CubicBezier,
   Line,
   // Point
@@ -37,18 +38,25 @@ interface CurveEntity extends DraftCurve {
 //   value: string;
 // };
 
-export type DraftEntity = {
+export type Entity = {
   id: string;
   exportable: boolean;
 } & (LineEntity | CurveEntity);
 
-export type RawEntities = Record<Piece, Array<DraftEntity>>;
+export type DocumentEntities = Record<Piece, Array<Entity>>;
 
-export type RawDraft = { rawEntities: RawEntities };
+export type DraftDocument = { entities: DocumentEntities };
 
-export type DraftDocument = {
-  entities: Array<DraftEntity>;
+type PerPieceProps = {
+  indices: { start: number; count: number };
+  bounds: BoundingBox;
 };
+
+export interface DraftLayout {
+  entities: Array<Entity>;
+  bounds: BoundingBox;
+  perPiece: Record<Piece, PerPieceProps>;
+}
 
 export type WithoutPiecePrefix<
   T extends string,
