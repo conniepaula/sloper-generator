@@ -8,8 +8,9 @@ import {
   translateEntity,
   getSeamLength,
   walkSeams,
+  computeBounds,
 } from "./draft.helpers";
-import type { DraftCurve, DraftLine, DraftEntity } from "./draft.types";
+import type { DraftCurve, DraftLine, Entity } from "./draft.types";
 import { curvePoints } from "../../geometry/geometry.helpers";
 
 test("addLine: function correctly adds line into context", () => {
@@ -66,7 +67,7 @@ test("extractLines: extracts only line geometries from mixed entities", () => {
   const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
   const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
 
-  const entities: DraftEntity[] = [
+  const entities: Array<Entity> = [
     {
       id: "front_line1",
       kind: "line",
@@ -107,7 +108,7 @@ test("extractExportableLines: extracts only exportable line geometries", () => {
   const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
   const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
 
-  const entities: DraftEntity[] = [
+  const entities: Array<Entity> = [
     {
       id: "front_line1",
       kind: "line",
@@ -142,9 +143,88 @@ test("extractExportableLines: extracts only exportable line geometries", () => {
   expect(exportableLines[0]).toEqual(line1);
 });
 
+test("computeBounds: returns the bounding box computed from exportable lines", () => {
+  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+  const entities: Array<Entity> = [
+    {
+      id: "front_line1",
+      kind: "line",
+      geometry: line1,
+      role: "guide",
+      piece: "front",
+      name: "Line 1",
+      exportable: true,
+    },
+    {
+      id: "front_curve1",
+      kind: "curve",
+      geometry: curve,
+      role: "main_outer",
+      piece: "front",
+      name: "Curve 1",
+      exportable: true,
+    },
+    {
+      id: "front_line2",
+      kind: "line",
+      geometry: line2,
+      role: "construction",
+      piece: "front",
+      name: "Line 2",
+      exportable: false,
+    },
+  ];
+
+  const result = computeBounds(entities);
+
+  expect(result).toEqual({
+    minX: 0,
+    minY: 0,
+    maxX: 1,
+    maxY: 1,
+  });
+});
+
+test("computeBounds: throws when there are no exportable lines", () => {
+  const line = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+  const entities: Array<Entity> = [
+    {
+      id: "front_curve",
+      kind: "curve",
+      geometry: curve,
+      role: "main_outer",
+      piece: "front",
+      name: "Curve",
+      exportable: true,
+    },
+    {
+      id: "front_line",
+      kind: "line",
+      geometry: line,
+      role: "construction",
+      piece: "front",
+      name: "Line",
+      exportable: false,
+    },
+  ];
+
+  expect(() => computeBounds(entities)).toThrow();
+});
+
+test("computeBounds: throws when array is empty", () => {
+  const entities: Array<Entity> = [];
+
+  expect(() => computeBounds(entities)).toThrow();
+});
+
 test("translateEntity: translates line geometry while preserving metadata", () => {
   const line = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
-  const entity: DraftEntity = {
+  const entity: Entity = {
     id: "front_line1",
     kind: "line",
     geometry: line,
@@ -155,7 +235,7 @@ test("translateEntity: translates line geometry while preserving metadata", () =
   };
 
   const translated = translateEntity(entity, 5, 3) as Extract<
-    DraftEntity,
+    Entity,
     { kind: "line" }
   >;
 
@@ -171,7 +251,7 @@ test("translateEntity: translates line geometry while preserving metadata", () =
 
 test("translateEntity: translates curve geometry while preserving metadata", () => {
   const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-  const entity: DraftEntity = {
+  const entity: Entity = {
     id: "front_curve1",
     kind: "curve",
     geometry: curve,
@@ -182,7 +262,7 @@ test("translateEntity: translates curve geometry while preserving metadata", () 
   };
 
   const translated = translateEntity(entity, 2, -1) as Extract<
-    DraftEntity,
+    Entity,
     { kind: "curve" }
   >;
 

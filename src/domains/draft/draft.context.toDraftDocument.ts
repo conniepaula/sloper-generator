@@ -1,23 +1,23 @@
 import { typedEntries } from "../../core/object";
-import type { RawDraft, RawEntities } from "../draft/draft.types";
+import type { DraftDocument, DocumentEntities } from "../draft/draft.types";
 import type { DraftContextBase } from "./draft.context.types";
 
-export const contextToRawDraft = <
+export const contextToDraftDocument = <
   TMeasurements,
   TPoints extends string,
   TLine extends string,
   TCurves extends string,
 >(
   ctx: DraftContextBase<TMeasurements, TPoints, TLine, TCurves>,
-): RawDraft => {
+): DraftDocument => {
   const { lines, curves } = ctx;
-  const rawEntities: RawEntities = { front: [], back: [] };
+  const entities: DocumentEntities = { front: [], back: [] };
 
   typedEntries(lines).forEach(([id, draftLine]) => {
     // only main lines are exportable
     const isExportable = draftLine.role !== "construction";
 
-    rawEntities[draftLine.piece].push({
+    entities[draftLine.piece].push({
       id,
       kind: "line",
       exportable: isExportable,
@@ -27,7 +27,7 @@ export const contextToRawDraft = <
 
   typedEntries(curves).forEach(([id, draftCurve]) => {
     // all curves are exportable
-    rawEntities[draftCurve.piece].push({
+    entities[draftCurve.piece].push({
       id,
       kind: "curve",
       exportable: true,
@@ -35,5 +35,5 @@ export const contextToRawDraft = <
     });
   });
 
-  return { rawEntities };
+  return { entities };
 };
