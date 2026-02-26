@@ -1,5 +1,7 @@
+import { assertNonEmpty } from "../../core/assert";
 import { DomainError, type DomainName } from "../../core/errors";
 import {
+  getBoundingBoxFromLines,
   lineLength,
   translateCurve,
   translateLine,
@@ -7,7 +9,7 @@ import {
 import type { CubicBezier, Line } from "../../geometry/geometry.types";
 import type {
   DraftCurve,
-  DraftEntity,
+  Entity,
   DraftLine,
   Piece,
   Role,
@@ -77,7 +79,7 @@ export const addCurve = <
  * @param entities Array of draft entities (lines and curves).
  * @returns Array of Line geometries, excluding curves.
  */
-export const extractLines = (entities: Array<DraftEntity>): Array<Line> => {
+export const extractLines = (entities: Array<Entity>): Array<Line> => {
   return entities.filter((e) => e.kind === "line").map((e) => e.geometry);
 };
 
@@ -89,15 +91,30 @@ export const extractLines = (entities: Array<DraftEntity>): Array<Line> => {
  * @param entities Array of draft entities (lines and curves).
  * @returns Array of Line geometries marked as exportable.
  */
-export const extractExportableLines = (
-  entities: Array<DraftEntity>,
-): Line[] => {
+export const extractExportableLines = (entities: Array<Entity>): Line[] => {
   return entities
     .filter(
-      (entity): entity is Extract<DraftEntity, { kind: "line" }> =>
+      (entity): entity is Extract<Entity, { kind: "line" }> =>
         entity.exportable && entity.kind === "line",
     )
     .map((entity) => entity.geometry);
+};
+
+/**
+ * Computes bounds for an array of entities.
+ *
+ * Currently, it only takes exportable lines into account.
+ */
+export const computeBounds = (entities: Array<Entity>) => {
+  // get lines from all entities
+  const lines = extractExportableLines(entities);
+
+  assertNonEmpty(
+    lines,
+    "Invariant violated: entities array has no exportable lines.",
+  );
+
+  return getBoundingBoxFromLines(lines);
 };
 
 /**
@@ -112,10 +129,10 @@ export const extractExportableLines = (
  * @returns A new entity with translated geometry.
  */
 export const translateEntity = (
-  entity: DraftEntity,
+  entity: Entity,
   dx: number = 0,
   dy: number = 0,
-): DraftEntity => {
+): Entity => {
   if (entity.kind === "line") {
     return { ...entity, geometry: translateLine(entity.geometry, dx, dy) };
   }

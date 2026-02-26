@@ -1,23 +1,15 @@
-import { assertNonEmpty } from "../../core/assert";
-import { getBoundingBoxFromLines } from "../../geometry/geometry.helpers";
-import { extractExportableLines, translateEntity } from "./draft.helpers";
-import type { DraftDocument, RawDraft } from "./draft.types";
+import { computeBounds, translateEntity } from "./draft.helpers";
+import type { DraftDocument, DraftLayout } from "./draft.types";
 
 export const composeDraftLayout = (
-  rawDraft: RawDraft,
-  spacing: number = 3,
-): DraftDocument => {
-  const { front, back } = rawDraft.rawEntities;
+  document: DraftDocument,
+  spacing: number,
+): DraftLayout => {
+  const { front, back } = document.entities;
 
+  // get front bounding box
+  const frontBoundingBox = computeBounds(front);
   // calculate x offset:
-  const frontLines = extractExportableLines(front);
-
-  assertNonEmpty(
-    frontLines,
-    "Invariant violated: front has no exportable lines.",
-  );
-
-  const frontBoundingBox = getBoundingBoxFromLines(frontLines);
   const xOffset = frontBoundingBox.maxX + spacing;
 
   // TODO: Work on y offset logic
@@ -27,5 +19,25 @@ export const composeDraftLayout = (
     translateEntity(backEntity, xOffset, yOffset),
   );
 
-  return { entities: [...front, ...translatedBack] };
+  // get translatedBack bounding box
+  const backBoundingBox = computeBounds(translatedBack);
+
+  // get full layout bounding box
+  const layoutEntities = [...front, ...translatedBack];
+  const layoutBoundingBox = computeBounds(layoutEntities);
+
+  return {
+    entities: layoutEntities,
+    bounds: layoutBoundingBox,
+    perPiece: {
+      front: {
+        indices: { start: 0, count: front.length },
+        bounds: frontBoundingBox,
+      },
+      back: {
+        indices: { start: front.length, count: translatedBack.length },
+        bounds: backBoundingBox,
+      },
+    },
+  };
 };

@@ -9,7 +9,6 @@ import {
   intersection,
 } from "../../geometry/geometry.helpers";
 import { ADDED_ARMSCYE_DEPTH, ORIGIN } from "./bodice.constants";
-import { DomainError } from "../../core/errors";
 import { BodiceError } from "./bodice.errors";
 
 /**
