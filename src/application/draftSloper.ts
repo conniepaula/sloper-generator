@@ -1,37 +1,25 @@
 import type { Result } from "../core/result";
-import { draftBodice } from "../domains/bodice/bodice.draft";
-import type { BodiceMeasurements } from "../domains/bodice/bodice.types";
-import { composeDraftLayout } from "../domains/draft/draft.composeLayout";
-import { contextToRawDraft } from "../domains/draft/draft.context.toRawDraft";
-import type { DraftDocument } from "../domains/draft/draft.types";
-import { toDraftingError, type DraftingError } from "./errors";
-
-type SloperMeasurementsMap = { bodice: BodiceMeasurements };
-type SloperType = keyof SloperMeasurementsMap;
-
-type DrafterMap = {
-  [K in SloperType]: (
-    measurements: SloperMeasurementsMap[K],
-  ) => Result<DraftDocument, DraftingError>;
-};
-
-const drafters: DrafterMap = {
-  bodice: (measurements) => {
-    const result = draftBodice(measurements);
-    if (!result.ok) return result;
-    const rawDraft = contextToRawDraft(result.data);
-    const draftDocument = composeDraftLayout(rawDraft, 3);
-    return { ok: true, data: draftDocument };
-  },
-};
+import { toDraftLayout } from "../domains/draft/draft.toDraftLayout";
+import { drafters } from "./drafters";
+import { fail, type DraftingError } from "./errors";
+import type { SloperMeasurementsMap, SloperType } from "./types";
+import type { DraftLayout } from "../domains/draft/draft.types";
 
 export const draftSloper = <TKind extends SloperType>(
   kind: TKind,
   measurements: SloperMeasurementsMap[TKind],
-): Result<DraftDocument, DraftingError> => {
+): Result<DraftLayout, DraftingError> => {
   try {
-    return drafters[kind](measurements);
+    // draft sloper
+    const drafterRes = drafters[kind](measurements);
+    if (!drafterRes.ok) return fail("drafter", kind, drafterRes.error);
+    // get draft layout
+    const draftLayoutRes = toDraftLayout(drafterRes.data);
+    if (!draftLayoutRes.ok) return fail("layout", kind, draftLayoutRes.error);
+    // draft + layout successful
+    return { ok: true, data: draftLayoutRes.data };
   } catch (err) {
-    return { ok: false, error: toDraftingError(err) };
+    // unexpected error
+    return fail("exception", kind, err);
   }
 };
