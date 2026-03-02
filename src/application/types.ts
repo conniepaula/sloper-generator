@@ -10,5 +10,5 @@ export type SloperType = keyof SloperMeasurementsMap;
 export type DrafterMap = {
   [K in SloperType]: (
     measurements: SloperMeasurementsMap[K],
-  ) => Result<SloperContextMap[K], DomainError | InvariantError>;
+  ) => Result<SloperContextMap[K], DomainError | InvariantError | Error>;
 };

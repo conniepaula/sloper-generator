@@ -1,25 +1,21 @@
-import type { Result } from "../core/result";
+import { Err, ResultWrapper as R, type Result } from "../core/result";
 import { toDraftLayout } from "../domains/draft/draft.toDraftLayout";
+import type { DraftLayout } from "../domains/draft/draft.types";
 import { drafters } from "./drafters";
 import { fail, type DraftingError } from "./errors";
 import type { SloperMeasurementsMap, SloperType } from "./types";
-import type { DraftLayout } from "../domains/draft/draft.types";
 
 export const draftSloper = <TKind extends SloperType>(
   kind: TKind,
   measurements: SloperMeasurementsMap[TKind],
 ): Result<DraftLayout, DraftingError> => {
   try {
-    // draft sloper
-    const drafterRes = drafters[kind](measurements);
-    if (!drafterRes.ok) return fail("drafter", kind, drafterRes.error);
-    // get draft layout
-    const draftLayoutRes = toDraftLayout(drafterRes.data);
-    if (!draftLayoutRes.ok) return fail("layout", kind, draftLayoutRes.error);
-    // draft + layout successful
-    return { ok: true, data: draftLayoutRes.data };
+    return R(drafters[kind](measurements))
+      .andThen((data) => toDraftLayout(data))
+      .mapErr((err) => fail("layout", kind, err))
+      .unwrap();
   } catch (err) {
     // unexpected error
-    return fail("exception", kind, err);
+    return Err(fail("exception", kind, err));
   }
 };
