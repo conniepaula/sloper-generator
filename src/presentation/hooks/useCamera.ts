@@ -28,12 +28,22 @@ export function useCamera(props: UseCameraProps) {
     setIsDragging(true);
   };
 
+  // TODO: Fix firefox pixelation on zoom
+  // TODO: Add zoom on pinch for mobile
   const onWheel = (e: React.WheelEvent<SVGSVGElement>) => {
     e.preventDefault();
     const SENSITIVITY = 0.002;
 
     const factor = Math.exp(-e.deltaY * SENSITIVITY);
-    setZoom((prevZoom) => clamp(prevZoom * factor, 0.2, 20));
+    const newZoom = clamp(zoom * factor, 0.2, 50);
+    // zooming to cursor
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cursorScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const x = cursorScreen.x - ((cursorScreen.x - pan.x) / zoom) * newZoom;
+    const y = cursorScreen.y - ((cursorScreen.y - pan.y) / zoom) * newZoom;
+
+    setPan({ x, y });
+    setZoom(newZoom);
   };
 
   useEffect(() => {

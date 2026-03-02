@@ -33,6 +33,7 @@ export const DraftCanvas: React.FC<DraftCanvasProps> = ({
       className="h-screen w-screen"
       onMouseDown={handlers.onMouseDown}
       onWheel={handlers.onWheel}
+      shapeRendering="geometricPrecision"
       // viewBox="-5 -5 30 90"
     >
       <g transform={transform}>{children}</g>
