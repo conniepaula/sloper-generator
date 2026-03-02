@@ -1,5 +1,5 @@
 import { InvariantError } from "../../core/errors";
-import type { Result } from "../../core/result";
+import { Err, type Result } from "../../core/result";
 import { composeDraftLayout } from "./draft.composeLayout";
 import { contextToDraftDocument } from "./draft.context.toDraftDocument";
 import type { DraftContextBase } from "./draft.context.types";
@@ -17,7 +17,7 @@ export const toDraftLayout = <
 >(
   ctx: DraftContextBase<TMeasurements, TPoints, TLine, TCurves>,
   opts: LayoutOptions = {},
-): Result<DraftLayout, InvariantError> => {
+): Result<DraftLayout, InvariantError | Error> => {
   const { spacing = 3 } = opts;
 
   try {
@@ -26,13 +26,12 @@ export const toDraftLayout = <
     return { ok: true, data: layout };
   } catch (err) {
     if (err instanceof InvariantError) {
-      return { ok: false, error: err };
+      return Err(err);
     }
-    return {
-      ok: false,
-      error: new InvariantError(
-        "toDraftLayout: An unknown error has occurred.",
-      ),
-    };
+    return Err(
+      new Error("toDraftLayout: An unknown error has occurred.", {
+        cause: err,
+      }),
+    );
   }
 };
