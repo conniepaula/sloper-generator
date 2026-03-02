@@ -25,12 +25,10 @@ export const ResultWrapper = <D, E>(result: Result<D, E>): ResultOpts<D, E> => {
       if (!result.ok) return ResultWrapper(result);
       return ResultWrapper(Ok(fn(result.data)));
     },
-
     mapErr(fn) {
       if (result.ok) return ResultWrapper(result);
       return ResultWrapper(Err(fn(result.error)));
     },
-
     unwrap() {
       return result;
     },
