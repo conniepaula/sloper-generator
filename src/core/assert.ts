@@ -7,6 +7,7 @@ export function assertNonEmpty<T>(
   message: string,
 ): asserts array is NonEmptyArray<T> {
   if (array.length === 0) {
+    // TODO: Add cause
     throw new InvariantError(message);
   }
 }

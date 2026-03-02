@@ -1,37 +1,21 @@
-import type { Result } from "../core/result";
-import { draftBodice } from "../domains/bodice/bodice.draft";
-import type { BodiceMeasurements } from "../domains/bodice/bodice.types";
-import { composeDraftLayout } from "../domains/draft/draft.composeLayout";
-import { contextToRawDraft } from "../domains/draft/draft.context.toRawDraft";
-import type { DraftDocument } from "../domains/draft/draft.types";
-import { toDraftingError, type DraftingError } from "./errors";
-
-type SloperMeasurementsMap = { bodice: BodiceMeasurements };
-type SloperType = keyof SloperMeasurementsMap;
-
-type DrafterMap = {
-  [K in SloperType]: (
-    measurements: SloperMeasurementsMap[K],
-  ) => Result<DraftDocument, DraftingError>;
-};
-
-const drafters: DrafterMap = {
-  bodice: (measurements) => {
-    const result = draftBodice(measurements);
-    if (!result.ok) return result;
-    const rawDraft = contextToRawDraft(result.data);
-    const draftDocument = composeDraftLayout(rawDraft, 3);
-    return { ok: true, data: draftDocument };
-  },
-};
+import { Err, ResultWrapper as R, type Result } from "../core/result";
+import { toDraftLayout } from "../domains/draft/draft.toDraftLayout";
+import type { DraftLayout } from "../domains/draft/draft.types";
+import { drafters } from "./drafters";
+import { fail, type DraftingError } from "./errors";
+import type { SloperMeasurementsMap, SloperType } from "./types";
 
 export const draftSloper = <TKind extends SloperType>(
   kind: TKind,
   measurements: SloperMeasurementsMap[TKind],
-): Result<DraftDocument, DraftingError> => {
+): Result<DraftLayout, DraftingError> => {
   try {
-    return drafters[kind](measurements);
+    return R(drafters[kind](measurements))
+      .andThen((data) => toDraftLayout(data))
+      .mapErr((err) => fail("layout", kind, err))
+      .unwrap();
   } catch (err) {
-    return { ok: false, error: toDraftingError(err) };
+    // unexpected error
+    return Err(fail("exception", kind, err));
   }
 };
