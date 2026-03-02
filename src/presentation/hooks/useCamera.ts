@@ -8,16 +8,15 @@ export type Pan = {
 
 type UseCameraProps = {
   initialPan: Pan;
+  initialZoom: number;
+  isSeeded: boolean;
 };
 
 export function useCamera(props: UseCameraProps) {
-  const { initialPan } = props;
+  const { initialPan, initialZoom, isSeeded } = props;
   // camera state
-  const [pan, setPan] = useState<Pan>(() => ({
-    x: initialPan.x,
-    y: initialPan.y,
-  }));
-  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState<Pan>(() => initialPan);
+  const [zoom, setZoom] = useState(() => initialZoom);
   const hasInitialized = useRef(false);
   // interaction state
   const [isDragging, setIsDragging] = useState(false);
@@ -48,11 +47,12 @@ export function useCamera(props: UseCameraProps) {
 
   useEffect(() => {
     if (hasInitialized.current) return;
-    if (!initialPan.x || !initialPan.y) return;
+    if (!isSeeded) return;
 
+    setZoom(initialZoom);
     setPan({ x: initialPan.x, y: initialPan.y });
     hasInitialized.current = true;
-  }, [initialPan]);
+  }, [initialPan, initialZoom, isSeeded]);
 
   useEffect(() => {
     if (!isDragging) return;

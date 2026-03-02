@@ -1,7 +1,8 @@
 import { draftSloper } from "../application/draftSloper";
 import { MOCK_MEASUREMENTS as m } from "../domains/bodice/bodice.constants";
-import { DraftCanvas, DraftCubicBezier } from "../render/DraftCanvas";
+import { DraftCubicBezier } from "../render/DraftCanvas";
 import { SvgLine } from "../render/SvgLine";
+import { DraftCanvas } from "./components/DraftCanvas";
 
 function App() {
   // THIS PAGE IS BEING USED FOR _TESTING_, not the final product!
@@ -21,7 +22,7 @@ function App() {
   return (
     <main className="">
       <div>
-        <DraftCanvas>
+        <DraftCanvas bounds={result.data.bounds}>
           {result.data.entities.map(
             ({ id, kind, geometry, exportable, role }) => {
               switch (kind) {

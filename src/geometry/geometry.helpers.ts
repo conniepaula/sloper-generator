@@ -391,3 +391,17 @@ export function getBoundingBoxFromLines(
 
   return { minX, maxX, minY, maxY };
 }
+
+/**
+ * Calculates the center point, width and height of a bounding box.
+ */
+export function getBoundingBoxMetrics(bounds: BoundingBox) {
+  const minPoint = { x: bounds.minX, y: bounds.minY };
+  const maxPoint = { x: bounds.maxX, y: bounds.maxY };
+
+  const center = midPoint(minPoint, maxPoint);
+  const height = bounds.maxY - bounds.minY;
+  const width = bounds.maxX - bounds.minX;
+
+  return { center, height, width };
+}
