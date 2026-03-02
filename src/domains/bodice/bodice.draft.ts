@@ -19,7 +19,7 @@ import {
 } from "./bodice.steps";
 import { walkSeams } from "../draft/draft.helpers";
 import { DomainError, InvariantError } from "../../core/errors";
-import type { Result } from "../../core/result";
+import { Err, Ok, type Result } from "../../core/result";
 import { BodiceError } from "./bodice.errors";
 
 const draftFrontBodice = (ctx: BodiceDraftContext) => {
@@ -44,7 +44,7 @@ const draftBackBodice = (ctx: BodiceDraftContext) => {
 
 export const draftBodice = (
   measurements: BodiceMeasurements,
-): Result<BodiceDraftContext, BodiceError | InvariantError> => {
+): Result<BodiceDraftContext, BodiceError | InvariantError | Error> => {
   const ctx = createBodiceDraftContext(measurements);
 
   try {
@@ -72,25 +72,19 @@ export const draftBodice = (
       },
     );
 
-    return { ok: true, data: ctx };
+    return Ok(ctx);
   } catch (err) {
-    if (err instanceof BodiceError) {
-      return {
-        ok: false,
-        error: err,
-      };
+    if (err instanceof BodiceError || err instanceof InvariantError) {
+      return Err(err);
     }
     if (err instanceof DomainError) {
       // error comes from shared domain utilities
-      return {
-        ok: false,
-        error: new BodiceError(err.message, err.details),
-      };
+      return Err(new BodiceError(err.message, err.details));
     }
-    return {
-      ok: false,
-      // TODO: Fix error
-      error: new InvariantError(err?.message ?? "An unknown error occurred."),
-    };
+    return Err(
+      new Error("An unknown error occurred while drafting the bodice.", {
+        cause: err,
+      }),
+    );
   }
 };
