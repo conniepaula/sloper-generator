@@ -1,5 +1,4 @@
 import { DomainError, InvariantError, type ErrorCodes } from "../core/errors";
-import type { Failure } from "../core/result";
 import type { SloperType } from "./types";
 
 type DraftStage = "drafter" | "layout" | "exception";
@@ -12,13 +11,13 @@ export type DraftingError = {
 };
 
 /*
- * Given the stage where draftSloper failed and the type of sloper it was drafting, it returns DraftingError wrapped by Result.
+ * Given the stage where draftSloper failed and the type of sloper it was drafting, it returns DraftingError.
  */
 export const fail = (
   stage: DraftStage,
   kind: SloperType,
   err: unknown,
-): Failure<DraftingError> => {
+): DraftingError => {
   const draftingErr = toDraftingError(err, stage);
   const ctx = {
     stage,
@@ -34,7 +33,7 @@ export const fail = (
     console.error(ctx, err);
   }
 
-  return { ok: false, error: draftingErr };
+  return draftingErr;
 };
 
 /*
