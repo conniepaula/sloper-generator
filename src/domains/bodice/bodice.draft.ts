@@ -17,9 +17,9 @@ import {
   draftWaistBack,
   draftWaistFront,
 } from "./bodice.steps";
-import { walkSeams } from "../draft/draft.helpers";
-import { DomainError, InvariantError } from "../../core/errors";
-import { Err, Ok, type Result } from "../../core/result";
+import { walkSeams } from "../../core/pattern/pattern.helpers";
+import { DomainError, InvariantError } from "../../core/utils/errors";
+import { Err, Ok, type Result } from "../../core/utils/result";
 import { BodiceError } from "./bodice.errors";
 
 const draftFrontBodice = (ctx: BodiceDraftContext) => {

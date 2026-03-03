@@ -1,4 +1,4 @@
-export type ErrorCodes = "DRAFT_FAILED" | "INVARIANT" | "DRAFT_RULE";
+export type ErrorCodes = "DRAFT_FAILED" | "INVARIANT" | "PATTERN_RULE";
 
 // TODO: Add cause
 
@@ -14,7 +14,7 @@ export type DomainName = "bodice" | "draft";
 export type DomainStep = string;
 
 export class DomainError extends Error {
-  readonly code = "DRAFT_RULE" as const;
+  readonly code = "PATTERN_RULE" as const;
   readonly domain: DomainName;
   readonly details?: unknown;
 

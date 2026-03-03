@@ -1,4 +1,8 @@
-import { DomainError, InvariantError, type ErrorCodes } from "../core/errors";
+import {
+  DomainError,
+  InvariantError,
+  type ErrorCodes,
+} from "../core/utils/errors";
 import type { SloperType } from "./types";
 
 type DraftStage = "drafter" | "layout" | "exception";
@@ -27,7 +31,7 @@ export const fail = (
     details: draftingErr.details,
   };
 
-  if (draftingErr.code === "DRAFT_RULE") {
+  if (draftingErr.code === "PATTERN_RULE") {
     console.warn(ctx);
   } else {
     console.error(ctx, err);

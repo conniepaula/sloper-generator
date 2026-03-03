@@ -1,5 +1,5 @@
-import type { NonEmptyArray } from "../core/assert";
-import { InvariantError } from "../core/errors";
+import type { NonEmptyArray } from "../core/utils/assert";
+import { InvariantError } from "../core/utils/errors";
 import {
   AxisEnumMap,
   IntersectionRangeEnumMap,

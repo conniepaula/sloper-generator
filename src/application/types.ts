@@ -1,5 +1,5 @@
-import type { DomainError, InvariantError } from "../core/errors";
-import type { Result } from "../core/result";
+import type { DomainError, InvariantError } from "../core/utils/errors";
+import type { Result } from "../core/utils/result";
 import type { BodiceDraftContext } from "../domains/bodice/bodice.context.types";
 import type { BodiceMeasurements } from "../domains/bodice/bodice.types";
 

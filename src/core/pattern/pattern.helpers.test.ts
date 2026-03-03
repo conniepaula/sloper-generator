@@ -9,13 +9,17 @@ import {
   getSeamLength,
   walkSeams,
   computeBounds,
-} from "./draft.helpers";
-import type { DraftCurve, DraftLine, Entity } from "./draft.types";
+} from "./pattern.helpers";
+import type {
+  PatternCurve as PatternCurve,
+  PatternLine,
+  Entity,
+} from "./pattern.types";
 import { curvePoints } from "../../geometry/geometry.helpers";
 
 test("addLine: function correctly adds line into context", () => {
   const ctx = {
-    lines: {} as Record<"front_bust" | "back_waist", DraftLine>,
+    lines: {} as Record<"front_bust" | "back_waist", PatternLine>,
   };
 
   const line = { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } };
@@ -24,7 +28,7 @@ test("addLine: function correctly adds line into context", () => {
   const frontBust = ctx.lines.front_bust;
 
   expect(frontBust).toBeDefined();
-  expectTypeOf(frontBust).toEqualTypeOf<DraftLine>();
+  expectTypeOf(frontBust).toEqualTypeOf<PatternLine>();
   expect(frontBust).toMatchObject({
     geometry: { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } },
     role: "guide",
@@ -39,7 +43,7 @@ test("addLine: function correctly adds line into context", () => {
 
 test("addCurve: function correctly adds curve into context", () => {
   const ctx = {
-    curves: {} as Record<"front_neckline" | "back_armhole", DraftCurve>,
+    curves: {} as Record<"front_neckline" | "back_armhole", PatternCurve>,
   };
 
   const curve = curvePoints({ x: 0, y: 1 }, { x: 1, y: 0 });
@@ -48,7 +52,7 @@ test("addCurve: function correctly adds curve into context", () => {
   const armhole = ctx.curves.back_armhole;
 
   expect(armhole).toBeDefined();
-  expectTypeOf(armhole).toEqualTypeOf<DraftCurve>();
+  expectTypeOf(armhole).toEqualTypeOf<PatternCurve>();
   // role not added, should be default: "guide"
   expect(armhole).toMatchObject({
     geometry: curve,

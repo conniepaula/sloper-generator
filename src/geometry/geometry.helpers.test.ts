@@ -23,7 +23,7 @@ import {
   orthogonallyProjectPointOntoLine,
   getBoundingBoxMetrics,
 } from "./geometry.helpers";
-import { assertNonEmpty } from "../core/assert";
+import { assertNonEmpty } from "../core/utils/assert";
 
 test("midPoint: find the correct point in the middle of two points", () => {
   const pointA = { x: 3, y: 5 };
