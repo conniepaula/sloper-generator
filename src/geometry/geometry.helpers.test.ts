@@ -1,6 +1,6 @@
 // TODO: Add unit tests for all helper functions
-
-import { expect, test } from "vitest";
+// TODO: Refactor to use describe and it
+import { describe, expect, it, test } from "vitest";
 import {
   curvePoints,
   midPoint,
@@ -21,6 +21,7 @@ import {
   translateCurve,
   getBoundingBoxFromLines,
   orthogonallyProjectPointOntoLine,
+  getBoundingBoxMetrics,
 } from "./geometry.helpers";
 import { assertNonEmpty } from "../core/assert";
 
@@ -235,5 +236,62 @@ test("getBoundingBoxFromLines: handles lines with identical endpoints", () => {
     maxX: 6,
     minY: 2,
     maxY: 5,
+  });
+});
+
+describe("getBoundingBoxData", () => {
+  it("returns center, width and height for a normal bounding box", () => {
+    const bounds = { minX: 10, minY: 20, maxX: 30, maxY: 70 };
+
+    const result = getBoundingBoxMetrics(bounds);
+
+    expect(result).toEqual({
+      center: { x: 20, y: 45 },
+      width: 20,
+      height: 50,
+    });
+  });
+
+  it("works with negative coordinates", () => {
+    const bounds = { minX: -10, minY: -20, maxX: 30, maxY: 40 };
+
+    const result = getBoundingBoxMetrics(bounds);
+
+    expect(result).toEqual({
+      center: { x: 10, y: 10 },
+      width: 40,
+      height: 60,
+    });
+  });
+
+  it("handles a degenerate box (zero width/height)", () => {
+    const bounds = { minX: 5, minY: 5, maxX: 5, maxY: 5 };
+
+    const result = getBoundingBoxMetrics(bounds);
+
+    expect(result).toEqual({
+      center: { x: 5, y: 5 },
+      width: 0,
+      height: 0,
+    });
+  });
+
+  it("is symmetric: swapping min/max pairs produces same center/metrics if values match", () => {
+    // This test is mostly to document expected behavior if upstream ever guarantees ordering.
+    const boundsA = { minX: 0, minY: 0, maxX: 100, maxY: 50 };
+    const boundsB = { minX: 0, minY: 0, maxX: 100, maxY: 50 };
+
+    expect(getBoundingBoxMetrics(boundsA)).toEqual(
+      getBoundingBoxMetrics(boundsB),
+    );
+  });
+
+  it("computes center as min + width/2 and min + height/2", () => {
+    const bounds = { minX: -25, minY: 10, maxX: 75, maxY: 110 };
+
+    const { center, width, height } = getBoundingBoxMetrics(bounds);
+
+    expect(center.x).toBe(bounds.minX + width / 2);
+    expect(center.y).toBe(bounds.minY + height / 2);
   });
 });
