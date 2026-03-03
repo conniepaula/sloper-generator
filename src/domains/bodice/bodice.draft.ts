@@ -17,9 +17,9 @@ import {
   draftWaistBack,
   draftWaistFront,
 } from "./bodice.steps";
-import { walkSeams } from "../draft/draft.helpers";
-import { DomainError, InvariantError } from "../../core/errors";
-import { Err, Ok, type Result } from "../../core/result";
+import { walkSeams } from "../../core/pattern/pattern.helpers";
+import { DomainError, InvariantError, type Result  } from "../../core/errors";
+import { Err, Ok, } from "../../core/utils/result";
 import { BodiceError } from "./bodice.errors";
 
 const draftFrontBodice = (ctx: BodiceDraftContext) => {
@@ -58,6 +58,7 @@ export const draftBodice = (
       ],
       ctx.lines.back_sideSeam.geometry,
       {
+        domain: "bodice",
         errorMessage:
           "Bodice front and back side seam lengths are different. Check your measurements.",
       },
@@ -67,6 +68,7 @@ export const draftBodice = (
       ctx.lines.front_shoulder.geometry,
       ctx.lines.back_shoulder.geometry,
       {
+        domain: "bodice",
         errorMessage:
           "Bodice front and back shoulder lengths are different. Check your measurements.",
       },

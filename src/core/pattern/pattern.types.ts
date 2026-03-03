@@ -9,29 +9,29 @@ export type Piece = "front" | "back";
 export type Role = "main_outer" | "main_inner" | "guide" | "construction";
 export type Seam = Line | Array<Line>;
 
-interface DraftGeometryWrapper {
+interface GeometryWrapper {
   role: Role;
   piece: Piece;
   name: string;
 }
 
-export interface DraftLine extends DraftGeometryWrapper {
+export interface PatternLine extends GeometryWrapper {
   geometry: Line;
 }
 
-export interface DraftCurve extends DraftGeometryWrapper {
+export interface PatternCurve extends GeometryWrapper {
   geometry: CubicBezier;
 }
 
-interface LineEntity extends DraftLine {
+interface LineEntity extends PatternLine {
   kind: "line";
 }
 
-interface CurveEntity extends DraftCurve {
+interface CurveEntity extends PatternCurve {
   kind: "curve";
 }
 
-// export type DraftText = {
+// export type PatternText = {
 //   id: string;
 //   kind: "text";
 //   position: Point;
@@ -45,14 +45,14 @@ export type Entity = {
 
 export type DocumentEntities = Record<Piece, Array<Entity>>;
 
-export type DraftDocument = { entities: DocumentEntities };
+export type PatternDocument = { entities: DocumentEntities };
 
 type PerPieceProps = {
   indices: { start: number; count: number };
   bounds: BoundingBox;
 };
 
-export interface DraftLayout {
+export interface PatternLayout {
   entities: Array<Entity>;
   bounds: BoundingBox;
   perPiece: Record<Piece, PerPieceProps>;

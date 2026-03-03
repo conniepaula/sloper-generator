@@ -1,10 +1,10 @@
-import { computeBounds, translateEntity } from "./draft.helpers";
-import type { DraftDocument, DraftLayout } from "./draft.types";
+import { computeBounds, translateEntity } from "./pattern.helpers";
+import type { PatternDocument, PatternLayout } from "./pattern.types";
 
-export const composeDraftLayout = (
-  document: DraftDocument,
+export const composePatternLayout = (
+  document: PatternDocument,
   spacing: number,
-): DraftLayout => {
+): PatternLayout => {
   const { front, back } = document.entities;
 
   // get front bounding box

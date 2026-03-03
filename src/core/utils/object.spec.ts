@@ -1,8 +1,8 @@
-import { describe, expect, test, expectTypeOf } from "vitest";
+import { describe, expect, it, expectTypeOf } from "vitest";
 import { typedEntries } from "./object";
 
-
-  test("typedEntries: returns entries like Object.entries", () => {
+describe("typedEntries", () => {
+  it("returns entries like Object.entries", () => {
     const obj = {
       a: { x: 1 },
       b: { y: 2 },
@@ -16,14 +16,13 @@ import { typedEntries } from "./object";
     ]);
   });
 
-  test("typedEntries: returns empty array for empty object", () => {
+  it("returns empty array for empty object", () => {
     const obj = {};
     const result = typedEntries(obj);
     expect(result).toEqual([]);
   });
 
-
-  test("typedEntries: keys are narrowed to keyof T (not string)", () => {
+  it("keys are narrowed to keyof T (not string)", () => {
     const obj = {
       foo: { x: 1 },
       bar: { y: 2 },
@@ -31,12 +30,12 @@ import { typedEntries } from "./object";
 
     const entries = typedEntries(obj);
 
-    type Key = typeof entries[number][0];
+    type Key = (typeof entries)[number][0];
 
     expectTypeOf<Key>().toEqualTypeOf<"foo" | "bar">();
   });
 
-  test("typedEntries: values are narrowed to union of value types", () => {
+  it("values are narrowed to union of value types", () => {
     const obj = {
       foo: { x: 1 },
       bar: { y: 2 },
@@ -44,14 +43,12 @@ import { typedEntries } from "./object";
 
     const entries = typedEntries(obj);
 
-    type Value = typeof entries[number][1];
+    type Value = (typeof entries)[number][1];
 
-    expectTypeOf<Value>().toEqualTypeOf<
-      { x: number } | { y: number }
-    >();
+    expectTypeOf<Value>().toEqualTypeOf<{ x: number } | { y: number }>();
   });
 
-  test("typedEntries: preserves correct key/value pairing", () => {
+  it("preserves correct key/value pairing", () => {
     const obj = {
       foo: { x: 1 },
       bar: { y: 2 },
@@ -71,16 +68,15 @@ import { typedEntries } from "./object";
     });
   });
 
-  test("typedEntries: accepts primitive values (unknown constraint)", () => {
+  it("accepts primitive values (unknown constraint)", () => {
     const result = typedEntries({
       a: 1,
       b: "hello",
       c: true,
     });
 
-    type Value = typeof result[number][1];
+    type Value = (typeof result)[number][1];
 
-    expectTypeOf<Value>().toEqualTypeOf<
-      number | string | boolean
-    >();
+    expectTypeOf<Value>().toEqualTypeOf<number | string | boolean>();
   });
+});

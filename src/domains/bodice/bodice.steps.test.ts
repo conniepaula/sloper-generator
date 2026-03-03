@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createBodiceDraftContext } from "./bodice.context";
 import { MOCK_MEASUREMENTS } from "./bodice.constants";
 import {
@@ -16,7 +16,7 @@ describe("testing bodice steps", () => {
   // create context
   const ctx = createBodiceDraftContext(MOCK_MEASUREMENTS);
 
-  test("draftBaseFront: creates base front points and construction lines", () => {
+  it("draftBaseFront: creates base front points and construction lines", () => {
     draftBaseFront(ctx);
 
     expect(ctx.points.front_centerTop).toBeDefined();
@@ -30,7 +30,7 @@ describe("testing bodice steps", () => {
     expect(ctx.lines.front_waistGuide.role).toBe("construction");
   });
 
-  test("draftHelpersFront: adds bust, armscye and shoulder guides", () => {
+  it("draftHelpersFront: adds bust, armscye and shoulder guides", () => {
     draftHelpersFront(ctx);
 
     expect(ctx.points.front_centerBust).toBeDefined();
@@ -42,7 +42,7 @@ describe("testing bodice steps", () => {
     expect(ctx.lines.front_shoulderGuide.role).toBe("construction");
   });
 
-  test("draftShoulderFront + draftNecklineFront: adds shoulder line and neckline curve", () => {
+  it("draftShoulderFront + draftNecklineFront: adds shoulder line and neckline curve", () => {
     draftShoulderFront(ctx);
     draftNecklineFront(ctx);
 
@@ -50,7 +50,7 @@ describe("testing bodice steps", () => {
     expect(ctx.curves.front_neckline.role).toBe("main_outer");
   });
 
-  test("draftWaistFront: creates waist dart and waist segments", () => {
+  it("draftWaistFront: creates waist dart and waist segments", () => {
     draftWaistFront(ctx);
 
     expect(ctx.lines.front_waistDartLeftLeg.role).toBe("main_inner");
@@ -60,14 +60,14 @@ describe("testing bodice steps", () => {
     expect(ctx.lines.front_waistLeftDartLegToSideSeam.role).toBe("main_outer");
   });
 
-  test("draftBaseBack: creates base back structure", () => {
+  it("draftBaseBack: creates base back structure", () => {
     draftBaseBack(ctx);
 
     expect(ctx.points.back_centerBackTop).toBeDefined();
     expect(ctx.lines.back_centerBack.role).toBe("construction");
   });
 
-  test("draftHelpersBack: adds bust and shoulder line guides", () => {
+  it("draftHelpersBack: adds bust and shoulder line guides", () => {
     draftHelpersBack(ctx);
 
     expect(ctx.points.back_sideBust).toBeDefined();

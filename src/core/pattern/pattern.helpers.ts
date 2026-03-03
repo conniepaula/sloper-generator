@@ -1,5 +1,5 @@
-import { assertNonEmpty } from "../../core/assert";
-import { DomainError, type DomainName } from "../../core/errors";
+import { assertNonEmpty } from "../utils/assert";
+import { DomainError } from "../errors";
 import {
   getBoundingBoxFromLines,
   lineLength,
@@ -8,14 +8,15 @@ import {
 } from "../../geometry/geometry.helpers";
 import type { CubicBezier, Line } from "../../geometry/geometry.types";
 import type {
-  DraftCurve,
+  PatternCurve,
   Entity,
-  DraftLine,
+  PatternLine,
   Piece,
   Role,
   Seam,
   WithoutPiecePrefix,
-} from "./draft.types";
+} from "./pattern.types";
+import type { DomainName } from "../slopers/registry";
 
 // TODO: Once aanchor points can be altered, separate line and curve options
 type AddOptions = {
@@ -24,7 +25,7 @@ type AddOptions = {
 };
 
 /**
- * Adds a `DraftLine` to the draft context.
+ * Adds a `PatternLine` to the pattern context.
  *
  * The line is stored under a piece-prefixed id (e.g. "front_centerFront").
  * Metadata such as role and name are attached for later rendering/export.
@@ -32,12 +33,15 @@ type AddOptions = {
  * @param options - Optional metadata. Default values:  {role: "guide", name: ""}
  */
 export const addLine = <
-  TDraftContext extends { lines: Record<string, DraftLine> },
+  TPatternContext extends { lines: Record<string, PatternLine> },
   TPiece extends Piece,
 >(
-  ctx: TDraftContext,
+  ctx: TPatternContext,
   piece: TPiece,
-  id: WithoutPiecePrefix<Extract<keyof TDraftContext["lines"], string>, TPiece>,
+  id: WithoutPiecePrefix<
+    Extract<keyof TPatternContext["lines"], string>,
+    TPiece
+  >,
   geometry: Line,
   options: AddOptions,
 ) => {
@@ -48,7 +52,7 @@ export const addLine = <
 };
 
 /**
- * Adds a cubic bezier curve to the draft context.
+ * Adds a `PatternCurve` to the pattern context.
  *
  * The curve is stored under a piece-prefixed id (e.g. "back_armhole").
  * Metadata such as role and name are attached for later rendering/export.
@@ -56,13 +60,13 @@ export const addLine = <
  * @param options - Optional metadata. Default values:  {role: "guide", name: ""}
  */
 export const addCurve = <
-  TDraftContext extends { curves: Record<string, DraftCurve> },
+  TPatternContext extends { curves: Record<string, PatternCurve> },
   TPiece extends Piece,
 >(
-  ctx: TDraftContext,
+  ctx: TPatternContext,
   piece: TPiece,
   id: WithoutPiecePrefix<
-    Extract<keyof TDraftContext["curves"], string>,
+    Extract<keyof TPatternContext["curves"], string>,
     TPiece
   >,
   geometry: CubicBezier,
@@ -74,9 +78,9 @@ export const addCurve = <
   ctx.curves[specificPieceId] = { geometry, role, piece, name };
 };
 
-/** Extracts line geometries from a collection of draft entities.
+/** Extracts line geometries from a collection of pattern entities.
  *
- * @param entities Array of draft entities (lines and curves).
+ * @param entities Array of pattern entities (lines and curves).
  * @returns Array of Line geometries, excluding curves.
  */
 export const extractLines = (entities: Array<Entity>): Array<Line> => {
@@ -84,11 +88,11 @@ export const extractLines = (entities: Array<Entity>): Array<Line> => {
 };
 
 /**
- * Extracts exportable line geometries from a collection of draft entities.
+ * Extracts exportable line geometries from a collection of pattern entities.
  *
  * Only includes lines that have the `exportable` property set to true.
  *
- * @param entities Array of draft entities (lines and curves).
+ * @param entities Array of pattern entities (lines and curves).
  * @returns Array of Line geometries marked as exportable.
  */
 export const extractExportableLines = (entities: Array<Entity>): Line[] => {
@@ -118,12 +122,12 @@ export const computeBounds = (entities: Array<Entity>) => {
 };
 
 /**
- * Translates a draft entity (line or curve) by given distances.
+ * Translates a pattern entity (line or curve) by given distances.
  *
  * Preserves all metadata (role, piece, name, etc.) while updating
  * the geometric coordinates.
  *
- * @param entity The draft entity to translate.
+ * @param entity The pattern entity to translate.
  * @param dx The horizontal translation distance (default: 0).
  * @param dy The vertical translation distance (default: 0).
  * @returns A new entity with translated geometry.
@@ -175,9 +179,9 @@ export const getSeamLength = (seam: Seam) => {
 };
 
 interface WalkSeamsOpts {
+  domain: DomainName;
   diff?: number;
   errorMessage?: string;
-  domain?: DomainName;
   details?: string;
 }
 
@@ -195,12 +199,12 @@ interface WalkSeamsOpts {
 export const walkSeams = (
   seam1: Seam,
   seam2: Seam,
-  opts: WalkSeamsOpts = {},
+  opts: WalkSeamsOpts,
 ) => {
   const {
+    domain,
     diff = 0.3,
     errorMessage = "Seam lengths too different. Check your measurements",
-    domain = "draft",
     details = "",
   } = opts;
   const seam1Length = getSeamLength(seam1);

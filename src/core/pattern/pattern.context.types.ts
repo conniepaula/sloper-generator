@@ -1,7 +1,7 @@
 import type { Point } from "../../geometry/geometry.types";
-import type { DraftCurve, DraftLine } from "./draft.types";
+import type { PatternCurve, PatternLine } from "./pattern.types";
 
-export type DraftContextBase<
+export type PatternDraftingContextBase<
   TMeasurements,
   TPoints extends string = string,
   TLine extends string = string,
@@ -9,6 +9,6 @@ export type DraftContextBase<
 > = {
   measurements: TMeasurements;
   points: Record<TPoints, Point>;
-  lines: Record<TLine, DraftLine>;
-  curves: Record<TCurves, DraftCurve>;
+  lines: Record<TLine, PatternLine>;
+  curves: Record<TCurves, PatternCurve>;
 };

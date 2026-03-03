@@ -1,4 +1,4 @@
-import type { DraftContextBase } from "../draft/draft.context.types";
+import type { PatternDraftingContextBase } from "../../core/pattern/pattern.context.types";
 import type { BodiceMeasurements } from "./bodice.types";
 
 type BodicePoints =
@@ -77,7 +77,7 @@ type BodiceCurves =
   | "back_neckline"
   | "back_armholeDepthToArmscye";
 
-export type BodiceDraftContext = DraftContextBase<
+export type BodiceDraftContext = PatternDraftingContextBase<
   BodiceMeasurements,
   BodicePoints,
   BodiceLines,

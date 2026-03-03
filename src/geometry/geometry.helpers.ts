@@ -1,4 +1,4 @@
-import type { NonEmptyArray } from "../core/assert";
+import type { NonEmptyArray } from "../core/utils/assert";
 import { InvariantError } from "../core/errors";
 import {
   AxisEnumMap,

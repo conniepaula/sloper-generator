@@ -24,7 +24,7 @@ import {
   unfoldBustDart,
   waistLineLength,
 } from "./bodice.helpers";
-import { addCurve, addLine } from "../draft/draft.helpers";
+import { addCurve, addLine } from "../../core/pattern/pattern.helpers";
 
 // DRAFTING STEPS - FRONT BODICE
 
