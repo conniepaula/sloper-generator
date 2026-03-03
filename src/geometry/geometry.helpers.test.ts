@@ -1,6 +1,4 @@
-// TODO: Add unit tests for all helper functions
-// TODO: Refactor to use describe and it
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   curvePoints,
   midPoint,
@@ -25,221 +23,294 @@ import {
 } from "./geometry.helpers";
 import { assertNonEmpty } from "../core/utils/assert";
 
-test("midPoint: find the correct point in the middle of two points", () => {
-  const pointA = { x: 3, y: 5 };
-  const pointB = { x: 6, y: 4 };
+describe("midPoint", () => {
+  it("finds the correct point in the middle of two points", () => {
+    const pointA = { x: 3, y: 5 };
+    const pointB = { x: 6, y: 4 };
 
-  const middle = midPoint(pointA, pointB);
-  expect(middle).toEqual({ x: 4.5, y: 4.5 });
-});
-
-test("curvePoints", () => {
-  const necklineStart = { x: 0, y: 5 };
-  const shoulderStart = { x: 8.57, y: 0 };
-  const points = curvePoints(necklineStart, shoulderStart);
-
-  expect(points.start).toEqual({ x: 0, y: 5 });
-  expect(points.control1).toEqual({ x: expect.closeTo(5.99, 1), y: 5 });
-  expect(points.control2).toEqual({ x: 8.57, y: 2.5 });
-  expect(points.end).toEqual({ x: 8.57, y: 0 });
-});
-
-test("vectorFrom and getMagnitude: produce correct vector and magnitude", () => {
-  const a = { x: 1, y: 2 };
-  const b = { x: 4, y: 6 };
-
-  const v = vectorFrom(a, b);
-  expect(v).toEqual({ x: 3, y: 4 });
-  expect(getMagnitude(v)).toBeCloseTo(5);
-});
-
-test("normalizeVector: returns unit vector and throws on zero vector", () => {
-  const v = { x: 3, y: 4 };
-  const n = normalizeVector(v);
-  expect(n.x).toBeCloseTo(3 / 5);
-  expect(n.y).toBeCloseTo(4 / 5);
-
-  expect(() => normalizeVector({ x: 0, y: 0 })).toThrow();
-});
-
-test("det2 and dotProduct and angleBetweenVectors: known relationships", () => {
-  const ux = { x: 1, y: 0 };
-  const uy = { x: 0, y: 1 };
-
-  expect(det2(ux, uy)).toBeCloseTo(1);
-  expect(dotProduct(ux, uy)).toBeCloseTo(0);
-  expect(angleBetweenVectors(ux, uy)).toBeCloseTo(Math.PI / 2, 6);
-});
-
-test("calculateSlope and getLineEquation: slope and intercept", () => {
-  const p1 = { x: 0, y: 0 };
-  const p2 = { x: 2, y: 2 };
-  expect(calculateSlope(p1, p2)).toBeCloseTo(1);
-
-  const line = { from: p1, to: p2 };
-  const eq = getLineEquation(line);
-  expect(eq.slope).toBeCloseTo(1);
-  expect(eq.yIntercept).toBeCloseTo(0);
-
-  // vertical line should throw
-  expect(() => calculateSlope({ x: 1, y: 0 }, { x: 1, y: 2 })).toThrow();
-});
-
-test("reflectPointOverLine and orthogonallyProjectPointOntoLine: projections and reflections", () => {
-  // project (1,1) onto horizontal line y=0 between x=-1 and x=1
-  const lineH = { from: { x: -1, y: 0 }, to: { x: 1, y: 0 } };
-  const p = { x: 1, y: 1 };
-  const proj = orthogonallyProjectPointOntoLine(p, lineH);
-  expect(proj).toEqual({ x: 1, y: 0 });
-
-  // reflect across vertical line x=0
-  const lineV = { from: { x: 0, y: -1 }, to: { x: 0, y: 1 } };
-  const reflected = reflectPointOverLine({ x: 1, y: 1 }, lineV);
-  expect(reflected).toEqual({ x: -1, y: 1 });
-});
-
-test("intersection: segment-segment, segment-ray, and ray-ray cases", () => {
-  // segment-segment crossing
-  const s1 = { from: { x: 0, y: 0 }, to: { x: 2, y: 2 } };
-  const s2 = { from: { x: 0, y: 2 }, to: { x: 2, y: 0 } };
-  expect(intersection.segmentSegment(s1, s2)).toEqual({ x: 1, y: 1 });
-
-  // parallel segments -> null
-  const s3 = { from: { x: 0, y: 0 }, to: { x: 2, y: 0 } };
-  const s4 = { from: { x: 0, y: 1 }, to: { x: 2, y: 1 } };
-  expect(intersection.segmentSegment(s3, s4)).toBeNull();
-
-  // segment-ray intersection
-  const lineSeg = { from: { x: 0, y: 0 }, to: { x: 2, y: 0 } };
-  const ray = { origin: { x: 1, y: -1 }, direction: { x: 0, y: 1 } };
-  expect(intersection.segmentRay(lineSeg, ray)).toEqual({ x: 1, y: 0 });
-
-  // segment-ray where intersection lies outside the segment bounds -> null
-  const rayOutside = { origin: { x: 3, y: -1 }, direction: { x: 0, y: 1 } };
-  expect(intersection.segmentRay(lineSeg, rayOutside)).toBeNull();
-
-  // ray-ray intersection
-  const ray1 = { origin: { x: 0, y: 0 }, direction: { x: 1, y: 1 } };
-  const ray2 = { origin: { x: 1, y: 0 }, direction: { x: 0, y: 1 } };
-  expect(intersection.rayRay(ray1, ray2)).toEqual({ x: 1, y: 1 });
-
-  // ray-ray where intersection occurs before one ray's origin -> null
-  const rayA = { origin: { x: 0, y: 0 }, direction: { x: 1, y: 0 } };
-  const rayB = { origin: { x: 1, y: 1 }, direction: { x: 0, y: 1 } };
-  expect(intersection.rayRay(rayA, rayB)).toBeNull();
-});
-
-test("rotateAboutPoint and translatePoint: transform points", () => {
-  const center = { x: 0, y: 0 };
-  const point = { x: 1, y: 0 };
-  const rotated = rotateAboutPoint(center, point, Math.PI / 2);
-  expect(rotated.x).toBeCloseTo(0);
-  expect(rotated.y).toBeCloseTo(1);
-
-  const translated = translatePoint(point, 2, 3);
-  expect(translated).toEqual({ x: 3, y: 3 });
-});
-
-test("lineLength: returns correct length for a line and zero length for identical points", () => {
-  const line = { from: { x: 0, y: 0 }, to: { x: 3, y: 4 } };
-  expect(lineLength(line)).toBeCloseTo(5);
-
-  const zero = { from: { x: 1, y: 1 }, to: { x: 1, y: 1 } };
-  expect(lineLength(zero)).toBeCloseTo(0);
-});
-
-test("translateLine: translates line endpoints by given distances", () => {
-  const line = { from: { x: 0, y: 0 }, to: { x: 2, y: 3 } };
-
-  const translated = translateLine(line, 5, -2);
-
-  expect(translated).toEqual({
-    from: { x: 5, y: -2 },
-    to: { x: 7, y: 1 },
+    const middle = midPoint(pointA, pointB);
+    expect(middle).toEqual({ x: 4.5, y: 4.5 });
   });
 });
 
-test("translateLine: handles zero translation", () => {
-  const line = { from: { x: 1, y: 2 }, to: { x: 3, y: 4 } };
+describe("curvePoints", () => {
+  it("generates control points with default tensions", () => {
+    const necklineStart = { x: 0, y: 5 };
+    const shoulderStart = { x: 8.57, y: 0 };
+    const points = curvePoints(necklineStart, shoulderStart);
 
-  const translated = translateLine(line, 0, 0);
-
-  expect(translated).toEqual(line);
-});
-
-test("translateCurve: translates all control points by given distances", () => {
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-
-  const translated = translateCurve(curve, 3, 2);
-
-  expect(translated.start).toEqual({ x: 3, y: 2 });
-  expect(translated.end).toEqual({ x: 8, y: 7 });
-  expect(translated.control1.x).toBeCloseTo(curve.control1.x + 3);
-  expect(translated.control1.y).toBeCloseTo(curve.control1.y + 2);
-  expect(translated.control2.x).toBeCloseTo(curve.control2.x + 3);
-  expect(translated.control2.y).toBeCloseTo(curve.control2.y + 2);
-});
-
-test("translateCurve: handles negative translation", () => {
-  const curve = curvePoints({ x: 10, y: 10 }, { x: 15, y: 15 });
-
-  const translated = translateCurve(curve, -5, -10);
-
-  expect(translated.start).toEqual({ x: 5, y: 0 });
-  expect(translated.end).toEqual({ x: 10, y: 5 });
-});
-
-test("getBoundingBoxFromLines: calculates bounding box for single line", () => {
-  const lines = [{ from: { x: 2, y: 7 }, to: { x: 8, y: 3 } }];
-
-  assertNonEmpty(lines, "Empty line array.");
-
-  const bbox = getBoundingBoxFromLines(lines);
-
-  expect(bbox).toEqual({
-    minX: 2,
-    maxX: 8,
-    minY: 3,
-    maxY: 7,
+    expect(points.start).toEqual({ x: 0, y: 5 });
+    expect(points.control1).toEqual({ x: expect.closeTo(5.99, 1), y: 5 });
+    expect(points.control2).toEqual({ x: 8.57, y: 2.5 });
+    expect(points.end).toEqual({ x: 8.57, y: 0 });
   });
 });
 
-test("getBoundingBoxFromLines: calculates bounding box for multiple lines", () => {
-  const lines = [
-    { from: { x: 0, y: 0 }, to: { x: 5, y: 5 } },
-    { from: { x: -2, y: 3 }, to: { x: 10, y: -1 } },
-    { from: { x: 7, y: 8 }, to: { x: 1, y: 2 } },
-  ];
+describe("vectorFrom", () => {
+  it("produces the displacement vector from point A to point B", () => {
+    const a = { x: 1, y: 2 };
+    const b = { x: 4, y: 6 };
 
-  assertNonEmpty(lines, "Empty line array.");
-  const bbox = getBoundingBoxFromLines(lines);
-
-  expect(bbox).toEqual({
-    minX: -2,
-    maxX: 10,
-    minY: -1,
-    maxY: 8,
+    const v = vectorFrom(a, b);
+    expect(v).toEqual({ x: 3, y: 4 });
   });
 });
 
-test("getBoundingBoxFromLines: handles lines with identical endpoints", () => {
-  const lines = [
-    { from: { x: 3, y: 4 }, to: { x: 3, y: 4 } },
-    { from: { x: 1, y: 2 }, to: { x: 6, y: 5 } },
-  ];
-
-  assertNonEmpty(lines, "Empty line array.");
-  const bbox = getBoundingBoxFromLines(lines);
-
-  expect(bbox).toEqual({
-    minX: 1,
-    maxX: 6,
-    minY: 2,
-    maxY: 5,
+describe("getMagnitude", () => {
+  it("returns the correct length of a vector", () => {
+    const v = { x: 3, y: 4 };
+    expect(getMagnitude(v)).toBeCloseTo(5);
   });
 });
 
-describe("getBoundingBoxData", () => {
+describe("normalizeVector", () => {
+  it("returns a unit vector for a non-zero input", () => {
+    const v = { x: 3, y: 4 };
+    const n = normalizeVector(v);
+    expect(n.x).toBeCloseTo(3 / 5);
+    expect(n.y).toBeCloseTo(4 / 5);
+  });
+
+  it("throws when given a zero vector", () => {
+    expect(() => normalizeVector({ x: 0, y: 0 })).toThrow();
+  });
+});
+
+describe("det2", () => {
+  it("computes the 2D determinant of orthogonal unit vectors", () => {
+    const ux = { x: 1, y: 0 };
+    const uy = { x: 0, y: 1 };
+    expect(det2(ux, uy)).toBeCloseTo(1);
+  });
+});
+
+describe("dotProduct", () => {
+  it("returns zero for perpendicular vectors", () => {
+    const ux = { x: 1, y: 0 };
+    const uy = { x: 0, y: 1 };
+    expect(dotProduct(ux, uy)).toBeCloseTo(0);
+  });
+});
+
+describe("angleBetweenVectors", () => {
+  it("calculates the right angle between orthogonal vectors", () => {
+    const ux = { x: 1, y: 0 };
+    const uy = { x: 0, y: 1 };
+    expect(angleBetweenVectors(ux, uy)).toBeCloseTo(Math.PI / 2, 6);
+  });
+});
+
+describe("calculateSlope", () => {
+  it("returns slope of a non-vertical line", () => {
+    const p1 = { x: 0, y: 0 };
+    const p2 = { x: 2, y: 2 };
+    expect(calculateSlope(p1, p2)).toBeCloseTo(1);
+  });
+
+  it("throws for vertical lines", () => {
+    expect(() => calculateSlope({ x: 1, y: 0 }, { x: 1, y: 2 })).toThrow();
+  });
+});
+
+describe("getLineEquation", () => {
+  it("computes slope and y-intercept correctly", () => {
+    const p1 = { x: 0, y: 0 };
+    const p2 = { x: 2, y: 2 };
+    const line = { from: p1, to: p2 };
+    const eq = getLineEquation(line);
+    expect(eq.slope).toBeCloseTo(1);
+    expect(eq.yIntercept).toBeCloseTo(0);
+  });
+});
+
+describe("orthogonallyProjectPointOntoLine", () => {
+  it("projects a point perpendicularly onto a line", () => {
+    const lineH = { from: { x: -1, y: 0 }, to: { x: 1, y: 0 } };
+    const p = { x: 1, y: 1 };
+    const proj = orthogonallyProjectPointOntoLine(p, lineH);
+    expect(proj).toEqual({ x: 1, y: 0 });
+  });
+});
+
+describe("reflectPointOverLine", () => {
+  it("reflects a point across a line using its orthogonal projection", () => {
+    const lineV = { from: { x: 0, y: -1 }, to: { x: 0, y: 1 } };
+    const reflected = reflectPointOverLine({ x: 1, y: 1 }, lineV);
+    expect(reflected).toEqual({ x: -1, y: 1 });
+  });
+});
+
+describe("intersection", () => {
+  describe("segmentSegment", () => {
+    it("returns intersection point for crossing segments", () => {
+      const s1 = { from: { x: 0, y: 0 }, to: { x: 2, y: 2 } };
+      const s2 = { from: { x: 0, y: 2 }, to: { x: 2, y: 0 } };
+      expect(intersection.segmentSegment(s1, s2)).toEqual({ x: 1, y: 1 });
+    });
+
+    it("returns null for parallel segments", () => {
+      const s3 = { from: { x: 0, y: 0 }, to: { x: 2, y: 0 } };
+      const s4 = { from: { x: 0, y: 1 }, to: { x: 2, y: 1 } };
+      expect(intersection.segmentSegment(s3, s4)).toBeNull();
+    });
+  });
+
+  describe("segmentRay", () => {
+    it("finds intersection when ray meets segment", () => {
+      const lineSeg = { from: { x: 0, y: 0 }, to: { x: 2, y: 0 } };
+      const ray = { origin: { x: 1, y: -1 }, direction: { x: 0, y: 1 } };
+      expect(intersection.segmentRay(lineSeg, ray)).toEqual({ x: 1, y: 0 });
+    });
+
+    it("returns null when intersection lies outside segment bounds", () => {
+      const lineSeg = { from: { x: 0, y: 0 }, to: { x: 2, y: 0 } };
+      const rayOutside = { origin: { x: 3, y: -1 }, direction: { x: 0, y: 1 } };
+      expect(intersection.segmentRay(lineSeg, rayOutside)).toBeNull();
+    });
+  });
+
+  describe("rayRay", () => {
+    it("returns intersection for two rays", () => {
+      const ray1 = { origin: { x: 0, y: 0 }, direction: { x: 1, y: 1 } };
+      const ray2 = { origin: { x: 1, y: 0 }, direction: { x: 0, y: 1 } };
+      expect(intersection.rayRay(ray1, ray2)).toEqual({ x: 1, y: 1 });
+    });
+
+    it("returns null when intersection occurs before a ray's origin", () => {
+      const rayA = { origin: { x: 0, y: 0 }, direction: { x: 1, y: 0 } };
+      const rayB = { origin: { x: 1, y: 1 }, direction: { x: 0, y: 1 } };
+      expect(intersection.rayRay(rayA, rayB)).toBeNull();
+    });
+  });
+});
+
+describe("rotateAboutPoint", () => {
+  it("rotates a point around a center by a given angle", () => {
+    const center = { x: 0, y: 0 };
+    const point = { x: 1, y: 0 };
+    const rotated = rotateAboutPoint(center, point, Math.PI / 2);
+    expect(rotated.x).toBeCloseTo(0);
+    expect(rotated.y).toBeCloseTo(1);
+  });
+});
+
+describe("translatePoint", () => {
+  it("translates a point by dx and dy", () => {
+    const point = { x: 1, y: 0 };
+    const translated = translatePoint(point, 2, 3);
+    expect(translated).toEqual({ x: 3, y: 3 });
+  });
+});
+
+describe("lineLength", () => {
+  it("returns correct length for a nonzero line and zero for identical endpoints", () => {
+    const line = { from: { x: 0, y: 0 }, to: { x: 3, y: 4 } };
+    expect(lineLength(line)).toBeCloseTo(5);
+
+    const zero = { from: { x: 1, y: 1 }, to: { x: 1, y: 1 } };
+    expect(lineLength(zero)).toBeCloseTo(0);
+  });
+});
+
+describe("translateLine", () => {
+  it("translates line endpoints by given distances", () => {
+    const line = { from: { x: 0, y: 0 }, to: { x: 2, y: 3 } };
+
+    const translated = translateLine(line, 5, -2);
+
+    expect(translated).toEqual({
+      from: { x: 5, y: -2 },
+      to: { x: 7, y: 1 },
+    });
+  });
+
+  it("handles zero translation", () => {
+    const line = { from: { x: 1, y: 2 }, to: { x: 3, y: 4 } };
+    const translated = translateLine(line, 0, 0);
+    expect(translated).toEqual(line);
+  });
+});
+
+
+describe("translateCurve", () => {
+  it("translates all control points by given distances", () => {
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+    const translated = translateCurve(curve, 3, 2);
+
+    expect(translated.start).toEqual({ x: 3, y: 2 });
+    expect(translated.end).toEqual({ x: 8, y: 7 });
+    expect(translated.control1.x).toBeCloseTo(curve.control1.x + 3);
+    expect(translated.control1.y).toBeCloseTo(curve.control1.y + 2);
+    expect(translated.control2.x).toBeCloseTo(curve.control2.x + 3);
+    expect(translated.control2.y).toBeCloseTo(curve.control2.y + 2);
+  });
+
+  it("handles negative translation", () => {
+    const curve = curvePoints({ x: 10, y: 10 }, { x: 15, y: 15 });
+
+    const translated = translateCurve(curve, -5, -10);
+
+    expect(translated.start).toEqual({ x: 5, y: 0 });
+    expect(translated.end).toEqual({ x: 10, y: 5 });
+  });
+});
+
+
+describe("getBoundingBoxFromLines", () => {
+  it("calculates bounding box for single line", () => {
+    const lines = [{ from: { x: 2, y: 7 }, to: { x: 8, y: 3 } }];
+
+    assertNonEmpty(lines, "Empty line array.");
+
+    const bbox = getBoundingBoxFromLines(lines);
+
+    expect(bbox).toEqual({
+      minX: 2,
+      maxX: 8,
+      minY: 3,
+      maxY: 7,
+    });
+  });
+
+  it("calculates bounding box for multiple lines", () => {
+    const lines = [
+      { from: { x: 0, y: 0 }, to: { x: 5, y: 5 } },
+      { from: { x: -2, y: 3 }, to: { x: 10, y: -1 } },
+      { from: { x: 7, y: 8 }, to: { x: 1, y: 2 } },
+    ];
+
+    assertNonEmpty(lines, "Empty line array.");
+    const bbox = getBoundingBoxFromLines(lines);
+
+    expect(bbox).toEqual({
+      minX: -2,
+      maxX: 10,
+      minY: -1,
+      maxY: 8,
+    });
+  });
+
+  it("handles lines with identical endpoints", () => {
+    const lines = [
+      { from: { x: 3, y: 4 }, to: { x: 3, y: 4 } },
+      { from: { x: 1, y: 2 }, to: { x: 6, y: 5 } },
+    ];
+
+    assertNonEmpty(lines, "Empty line array.");
+    const bbox = getBoundingBoxFromLines(lines);
+
+    expect(bbox).toEqual({
+      minX: 1,
+      maxX: 6,
+      minY: 2,
+      maxY: 5,
+    });
+  });
+});
+
+
+describe("getBoundingBoxMetrics", () => {
   it("returns center, width and height for a normal bounding box", () => {
     const bounds = { minX: 10, minY: 20, maxX: 30, maxY: 70 };
 
@@ -277,7 +348,6 @@ describe("getBoundingBoxData", () => {
   });
 
   it("is symmetric: swapping min/max pairs produces same center/metrics if values match", () => {
-    // This test is mostly to document expected behavior if upstream ever guarantees ordering.
     const boundsA = { minX: 0, minY: 0, maxX: 100, maxY: 50 };
     const boundsB = { minX: 0, minY: 0, maxX: 100, maxY: 50 };
 

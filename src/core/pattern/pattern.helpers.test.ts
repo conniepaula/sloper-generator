@@ -1,4 +1,4 @@
-import { assertType, expect, expectTypeOf, test } from "vitest";
+import { assertType, describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   addCurve,
@@ -9,302 +9,334 @@ import {
   getSeamLength,
   walkSeams,
   computeBounds,
+  getLineArrayLength,
 } from "./pattern.helpers";
 import type {
-  PatternCurve as PatternCurve,
+  PatternCurve,
   PatternLine,
   Entity,
 } from "./pattern.types";
 import { curvePoints } from "../../geometry/geometry.helpers";
 
-test("addLine: function correctly adds line into context", () => {
-  const ctx = {
-    lines: {} as Record<"front_bust" | "back_waist", PatternLine>,
-  };
 
-  const line = { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } };
-  addLine(ctx, "front", "bust", line, { name: "Bust", role: "guide" });
+describe("addLine", () => {
+  it("correctly adds a line into the context with provided metadata", () => {
+    const ctx = {
+      lines: {} as Record<"front_bust" | "back_waist", PatternLine>,
+    };
 
-  const frontBust = ctx.lines.front_bust;
+    const line = { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } };
+    addLine(ctx, "front", "bust", line, { name: "Bust", role: "guide" });
 
-  expect(frontBust).toBeDefined();
-  expectTypeOf(frontBust).toEqualTypeOf<PatternLine>();
-  expect(frontBust).toMatchObject({
-    geometry: { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } },
-    role: "guide",
-    piece: "front",
-    name: "Bust",
-  });
+    const frontBust = ctx.lines.front_bust;
 
-  // type error when trying to create an id with the wrong piece type
-  // @ts-expect-error "waist" is not assignable to "bust"
-  assertType(addLine(ctx, "front", "waist", line, {}));
-});
-
-test("addCurve: function correctly adds curve into context", () => {
-  const ctx = {
-    curves: {} as Record<"front_neckline" | "back_armhole", PatternCurve>,
-  };
-
-  const curve = curvePoints({ x: 0, y: 1 }, { x: 1, y: 0 });
-
-  addCurve(ctx, "back", "armhole", curve, { name: "Armhole" });
-  const armhole = ctx.curves.back_armhole;
-
-  expect(armhole).toBeDefined();
-  expectTypeOf(armhole).toEqualTypeOf<PatternCurve>();
-  // role not added, should be default: "guide"
-  expect(armhole).toMatchObject({
-    geometry: curve,
-    role: "guide",
-    piece: "back",
-    name: "Armhole",
-  });
-
-  // type error when trying to create an id with the wrong piece type
-  // @ts-expect-error "armhole" is not assignable to "neckline"
-  assertType(addCurve(ctx, "front", "waist", curve, {}));
-});
-
-test("extractLines: extracts only line geometries from mixed entities", () => {
-  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
-  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-
-  const entities: Array<Entity> = [
-    {
-      id: "front_line1",
-      kind: "line",
-      geometry: line1,
+    expect(frontBust).toBeDefined();
+    expectTypeOf(frontBust).toEqualTypeOf<PatternLine>();
+    expect(frontBust).toMatchObject({
+      geometry: { from: { x: 0, y: 1 }, to: { x: 1, y: 0 } },
       role: "guide",
       piece: "front",
-      name: "Line 1",
-      exportable: true,
-    },
-    {
-      id: "front_curve1",
-      kind: "curve",
-      geometry: curve,
-      role: "main_outer",
-      piece: "front",
-      name: "Curve 1",
-      exportable: true,
-    },
-    {
-      id: "front_line2",
-      kind: "line",
-      geometry: line2,
-      role: "construction",
-      piece: "front",
-      name: "Line 2",
-      exportable: false,
-    },
-  ];
+      name: "Bust",
+    });
 
-  const lines = extractLines(entities);
-  expect(lines).toHaveLength(2);
-  expect(lines[0]).toEqual(line1);
-  expect(lines[1]).toEqual(line2);
-});
-
-test("extractExportableLines: extracts only exportable line geometries", () => {
-  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
-  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-
-  const entities: Array<Entity> = [
-    {
-      id: "front_line1",
-      kind: "line",
-      geometry: line1,
-      role: "guide",
-      piece: "front",
-      name: "Line 1",
-      exportable: true,
-    },
-    {
-      id: "front_curve1",
-      kind: "curve",
-      geometry: curve,
-      role: "main_outer",
-      piece: "front",
-      name: "Curve 1",
-      exportable: true,
-    },
-    {
-      id: "front_line2",
-      kind: "line",
-      geometry: line2,
-      role: "construction",
-      piece: "front",
-      name: "Line 2",
-      exportable: false,
-    },
-  ];
-
-  const exportableLines = extractExportableLines(entities);
-  expect(exportableLines).toHaveLength(1);
-  expect(exportableLines[0]).toEqual(line1);
-});
-
-test("computeBounds: returns the bounding box computed from exportable lines", () => {
-  const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
-  const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-
-  const entities: Array<Entity> = [
-    {
-      id: "front_line1",
-      kind: "line",
-      geometry: line1,
-      role: "guide",
-      piece: "front",
-      name: "Line 1",
-      exportable: true,
-    },
-    {
-      id: "front_curve1",
-      kind: "curve",
-      geometry: curve,
-      role: "main_outer",
-      piece: "front",
-      name: "Curve 1",
-      exportable: true,
-    },
-    {
-      id: "front_line2",
-      kind: "line",
-      geometry: line2,
-      role: "construction",
-      piece: "front",
-      name: "Line 2",
-      exportable: false,
-    },
-  ];
-
-  const result = computeBounds(entities);
-
-  expect(result).toEqual({
-    minX: 0,
-    minY: 0,
-    maxX: 1,
-    maxY: 1,
+    // type error when trying to create an id with the wrong piece type
+    // @ts-expect-error "waist" is not assignable to "bust"
+    assertType(addLine(ctx, "front", "waist", line, {}));
   });
 });
 
-test("computeBounds: throws when there are no exportable lines", () => {
-  const line = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+describe("addCurve", () => {
+  it("correctly adds a curve into the context with provided metadata", () => {
+    const ctx = {
+      curves: {} as Record<"front_neckline" | "back_armhole", PatternCurve>,
+    };
 
-  const entities: Array<Entity> = [
-    {
-      id: "front_curve",
-      kind: "curve",
+    const curve = curvePoints({ x: 0, y: 1 }, { x: 1, y: 0 });
+
+    addCurve(ctx, "back", "armhole", curve, { name: "Armhole" });
+    const armhole = ctx.curves.back_armhole;
+
+    expect(armhole).toBeDefined();
+    expectTypeOf(armhole).toEqualTypeOf<PatternCurve>();
+    // role not added, should be default: "guide"
+    expect(armhole).toMatchObject({
       geometry: curve,
-      role: "main_outer",
-      piece: "front",
-      name: "Curve",
-      exportable: true,
-    },
-    {
-      id: "front_line",
+      role: "guide",
+      piece: "back",
+      name: "Armhole",
+    });
+
+    // type error when trying to create an id with the wrong piece type
+    // @ts-expect-error "armhole" is not assignable to "neckline"
+    assertType(addCurve(ctx, "front", "waist", curve, {}));
+  });
+});
+
+describe("extractLines", () => {
+  it("extracts only line geometries from mixed entities", () => {
+    const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+    const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+    const entities: Array<Entity> = [
+      {
+        id: "front_line1",
+        kind: "line",
+        geometry: line1,
+        role: "guide",
+        piece: "front",
+        name: "Line 1",
+        exportable: true,
+      },
+      {
+        id: "front_curve1",
+        kind: "curve",
+        geometry: curve,
+        role: "main_outer",
+        piece: "front",
+        name: "Curve 1",
+        exportable: true,
+      },
+      {
+        id: "front_line2",
+        kind: "line",
+        geometry: line2,
+        role: "construction",
+        piece: "front",
+        name: "Line 2",
+        exportable: false,
+      },
+    ];
+
+    const lines = extractLines(entities);
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toEqual(line1);
+    expect(lines[1]).toEqual(line2);
+  });
+});
+
+describe("extractExportableLines", () => {
+  it("extracts only exportable line geometries", () => {
+    const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+    const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+    const entities: Array<Entity> = [
+      {
+        id: "front_line1",
+        kind: "line",
+        geometry: line1,
+        role: "guide",
+        piece: "front",
+        name: "Line 1",
+        exportable: true,
+      },
+      {
+        id: "front_curve1",
+        kind: "curve",
+        geometry: curve,
+        role: "main_outer",
+        piece: "front",
+        name: "Curve 1",
+        exportable: true,
+      },
+      {
+        id: "front_line2",
+        kind: "line",
+        geometry: line2,
+        role: "construction",
+        piece: "front",
+        name: "Line 2",
+        exportable: false,
+      },
+    ];
+
+    const exportableLines = extractExportableLines(entities);
+    expect(exportableLines).toHaveLength(1);
+    expect(exportableLines[0]).toEqual(line1);
+  });
+});
+
+describe("computeBounds", () => {
+  it("returns the bounding box computed from exportable lines", () => {
+    const line1 = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+    const line2 = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+    const entities: Array<Entity> = [
+      {
+        id: "front_line1",
+        kind: "line",
+        geometry: line1,
+        role: "guide",
+        piece: "front",
+        name: "Line 1",
+        exportable: true,
+      },
+      {
+        id: "front_curve1",
+        kind: "curve",
+        geometry: curve,
+        role: "main_outer",
+        piece: "front",
+        name: "Curve 1",
+        exportable: true,
+      },
+      {
+        id: "front_line2",
+        kind: "line",
+        geometry: line2,
+        role: "construction",
+        piece: "front",
+        name: "Line 2",
+        exportable: false,
+      },
+    ];
+
+    const result = computeBounds(entities);
+
+    expect(result).toEqual({
+      minX: 0,
+      minY: 0,
+      maxX: 1,
+      maxY: 1,
+    });
+  });
+
+  it("throws when there are no exportable lines", () => {
+    const line = { from: { x: 2, y: 2 }, to: { x: 3, y: 3 } };
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+
+    const entities: Array<Entity> = [
+      {
+        id: "front_curve",
+        kind: "curve",
+        geometry: curve,
+        role: "main_outer",
+        piece: "front",
+        name: "Curve",
+        exportable: true,
+      },
+      {
+        id: "front_line",
+        kind: "line",
+        geometry: line,
+        role: "construction",
+        piece: "front",
+        name: "Line",
+        exportable: false,
+      },
+    ];
+
+    expect(() => computeBounds(entities)).toThrow();
+  });
+
+  it("throws when array is empty", () => {
+    const entities: Array<Entity> = [];
+    expect(() => computeBounds(entities)).toThrow();
+  });
+});
+
+describe("translateEntity", () => {
+  it("translates line geometry while preserving metadata", () => {
+    const line = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+    const entity: Entity = {
+      id: "front_line1",
       kind: "line",
       geometry: line,
-      role: "construction",
+      role: "guide",
       piece: "front",
-      name: "Line",
-      exportable: false,
-    },
-  ];
+      name: "Test Line",
+      exportable: true,
+    };
 
-  expect(() => computeBounds(entities)).toThrow();
-});
+    const translated = translateEntity(entity, 5, 3) as Extract<
+      Entity,
+      { kind: "line" }
+    >;
 
-test("computeBounds: throws when array is empty", () => {
-  const entities: Array<Entity> = [];
-
-  expect(() => computeBounds(entities)).toThrow();
-});
-
-test("translateEntity: translates line geometry while preserving metadata", () => {
-  const line = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
-  const entity: Entity = {
-    id: "front_line1",
-    kind: "line",
-    geometry: line,
-    role: "guide",
-    piece: "front",
-    name: "Test Line",
-    exportable: true,
-  };
-
-  const translated = translateEntity(entity, 5, 3) as Extract<
-    Entity,
-    { kind: "line" }
-  >;
-
-  expect(translated.kind).toBe("line");
-  expect(translated.geometry).toEqual({
-    from: { x: 5, y: 3 },
-    to: { x: 6, y: 4 },
+    expect(translated.kind).toBe("line");
+    expect(translated.geometry).toEqual({
+      from: { x: 5, y: 3 },
+      to: { x: 6, y: 4 },
+    });
+    expect(translated.role).toBe("guide");
+    expect(translated.piece).toBe("front");
+    expect(translated.name).toBe("Test Line");
   });
-  expect(translated.role).toBe("guide");
-  expect(translated.piece).toBe("front");
-  expect(translated.name).toBe("Test Line");
+
+  it("translates curve geometry while preserving metadata", () => {
+    const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+    const entity: Entity = {
+      id: "front_curve1",
+      kind: "curve",
+      geometry: curve,
+      role: "main_outer",
+      piece: "front",
+      name: "Test Curve",
+      exportable: true,
+    };
+
+    const translated = translateEntity(entity, 2, -1) as Extract<
+      Entity,
+      { kind: "curve" }
+    >;
+
+    expect(translated.kind).toBe("curve");
+    expect(translated.geometry.start).toEqual({ x: 2, y: -1 });
+    expect(translated.geometry.end).toEqual({ x: 7, y: 4 });
+    expect(translated.role).toBe("main_outer");
+    expect(translated.piece).toBe("front");
+    expect(translated.name).toBe("Test Curve");
+  });
 });
 
-test("translateEntity: translates curve geometry while preserving metadata", () => {
-  const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
-  const entity: Entity = {
-    id: "front_curve1",
-    kind: "curve",
-    geometry: curve,
-    role: "main_outer",
-    piece: "front",
-    name: "Test Curve",
-    exportable: true,
-  };
+describe("getLineArrayLength", () => {
+  it("returns 0 for empty array", () => {
+    expect(getLineArrayLength([])).toBe(0);
+  });
 
-  const translated = translateEntity(entity, 2, -1) as Extract<
-    Entity,
-    { kind: "curve" }
-  >;
-
-  expect(translated.kind).toBe("curve");
-  expect(translated.geometry.start).toEqual({ x: 2, y: -1 });
-  expect(translated.geometry.end).toEqual({ x: 7, y: 4 });
-  expect(translated.role).toBe("main_outer");
-  expect(translated.piece).toBe("front");
-  expect(translated.name).toBe("Test Curve");
+  it("sums the lengths of provided lines", () => {
+    const lines = [
+      { from: { x: 0, y: 0 }, to: { x: 3, y: 4 } }, // length 5
+      { from: { x: 0, y: 0 }, to: { x: 0, y: 2 } }, // length 2
+    ];
+    expect(getLineArrayLength(lines)).toBeCloseTo(7);
+  });
 });
 
-test("getSeamLength: correctly gets seam length for seams with multiple segments (line array)", () => {
-  const seamArray = [
-    { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } },
-    { from: { x: -2, y: -2 }, to: { x: -1, y: -1 } },
-  ];
 
-  const result = getSeamLength(seamArray);
-  expect(result).toBeCloseTo(2.828);
+describe("getSeamLength", () => {
+  it("correctly calculates length for seam array", () => {
+    const seamArray = [
+      { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } },
+      { from: { x: -2, y: -2 }, to: { x: -1, y: -1 } },
+    ];
+
+    const result = getSeamLength(seamArray);
+    expect(result).toBeCloseTo(2.828);
+  });
+
+  it("calculates length for a single-line seam", () => {
+    const seam = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+
+    const result = getSeamLength(seam);
+    expect(result).toBeCloseTo(1.414);
+  });
 });
 
-test("getSeamLength: correctly gets seam length for seams with a single segment (line)", () => {
-  const seam = { from: { x: 0, y: 0 }, to: { x: 1, y: 1 } };
+describe("walkSeams", () => {
+  it("does not throw when seams are equal length", () => {
+    const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
+    const seam2 = { from: { x: 2, y: 2 }, to: { x: 1, y: 1 } };
 
-  const result = getSeamLength(seam);
-  expect(result).toBeCloseTo(1.414);
-});
+    expect(() => walkSeams(seam1, seam2, { domain: "bodice" })).not.toThrow();
+  });
 
-test("walkSeams: not throw  when seams are  of equal length", () => {
-  const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
-  const seam2 = { from: { x: 2, y: 2 }, to: { x: 1, y: 1 } };
+  it("throws when seams differ in length beyond tolerance", () => {
+    const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
+    const seam2 = { from: { x: 0, y: 0 }, to: { x: 10, y: 10 } };
 
-  expect(() => walkSeams(seam1, seam2, {domain: "bodice"})).not.toThrow();
-});
-
-test("walkSeams: throw when seams are not of equal length", () => {
-  const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
-  const seam2 = { from: { x: 0, y: 0 }, to: { x: 10, y: 10 } };
-
-  expect(() => walkSeams(seam1, seam2, {domain: "bodice"})).toThrow();
+    expect(() => walkSeams(seam1, seam2, { domain: "bodice" })).toThrow();
+  });
 });
