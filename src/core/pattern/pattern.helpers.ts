@@ -1,5 +1,5 @@
 import { assertNonEmpty } from "../utils/assert";
-import { DomainError, type DomainName } from "../utils/errors";
+import { DomainError } from "../errors";
 import {
   getBoundingBoxFromLines,
   lineLength,
@@ -16,6 +16,7 @@ import type {
   Seam,
   WithoutPiecePrefix,
 } from "./pattern.types";
+import type { DomainName } from "../slopers/registry";
 
 // TODO: Once aanchor points can be altered, separate line and curve options
 type AddOptions = {
@@ -178,9 +179,9 @@ export const getSeamLength = (seam: Seam) => {
 };
 
 interface WalkSeamsOpts {
+  domain: DomainName;
   diff?: number;
   errorMessage?: string;
-  domain?: DomainName;
   details?: string;
 }
 
@@ -198,12 +199,12 @@ interface WalkSeamsOpts {
 export const walkSeams = (
   seam1: Seam,
   seam2: Seam,
-  opts: WalkSeamsOpts = {},
+  opts: WalkSeamsOpts,
 ) => {
   const {
+    domain,
     diff = 0.3,
     errorMessage = "Seam lengths too different. Check your measurements",
-    domain = "draft",
     details = "",
   } = opts;
   const seam1Length = getSeamLength(seam1);

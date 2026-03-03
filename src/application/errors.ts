@@ -2,7 +2,7 @@ import {
   DomainError,
   InvariantError,
   type ErrorCodes,
-} from "../core/utils/errors";
+} from "../core/errors";
 import type { SloperType } from "./types";
 
 type DraftStage = "drafter" | "layout" | "exception";

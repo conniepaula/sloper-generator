@@ -1,4 +1,4 @@
-import { InvariantError } from "./errors";
+import { InvariantError } from "../errors";
 
 export type NonEmptyArray<T> = [T, ...T[]];
 

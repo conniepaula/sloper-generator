@@ -1,5 +1,6 @@
-import { InvariantError } from "../utils/errors";
-import { Err, type Result } from "../utils/result";
+import { InvariantError } from "../errors";
+import { type Result } from "../errors/Result";
+import { Err } from "../utils/result";
 import { composePatternLayout } from "./pattern.composeLayout";
 import { contextToPatternModel } from "./pattern.context.toModel";
 import type { PatternDraftingContextBase } from "./pattern.context.types";

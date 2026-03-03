@@ -299,12 +299,12 @@ test("walkSeams: not throw  when seams are  of equal length", () => {
   const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
   const seam2 = { from: { x: 2, y: 2 }, to: { x: 1, y: 1 } };
 
-  expect(() => walkSeams(seam1, seam2)).not.toThrow();
+  expect(() => walkSeams(seam1, seam2, {domain: "bodice"})).not.toThrow();
 });
 
 test("walkSeams: throw when seams are not of equal length", () => {
   const seam1 = { from: { x: 1, y: 1 }, to: { x: 0, y: 0 } };
   const seam2 = { from: { x: 0, y: 0 }, to: { x: 10, y: 10 } };
 
-  expect(() => walkSeams(seam1, seam2)).toThrow();
+  expect(() => walkSeams(seam1, seam2, {domain: "bodice"})).toThrow();
 });

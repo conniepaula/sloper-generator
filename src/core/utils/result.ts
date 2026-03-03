@@ -1,5 +1,4 @@
-export type Success<TData> = { ok: true; data: TData };
-export type Failure<TError> = { ok: false; error: TError };
+import type { Failure, Result, Success } from "../errors/Result";
 
 export const Ok = <TData>(data: TData): Success<TData> => ({ ok: true, data });
 export const Err = <TError>(err: TError): Failure<TError> => ({
@@ -7,7 +6,7 @@ export const Err = <TError>(err: TError): Failure<TError> => ({
   error: err,
 });
 
-export type Result<D, E> = Success<D> | Failure<E>;
+
 type ResultOpts<D, E> = {
   andThen<D2, E2>(fn: (data: D) => Result<D2, E2>): ResultOpts<D2, E | E2>;
   map<D2>(fn: (data: D) => D2): ResultOpts<D2, E>;

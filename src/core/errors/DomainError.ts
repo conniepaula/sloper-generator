@@ -1,16 +1,4 @@
-export type ErrorCodes = "DRAFT_FAILED" | "INVARIANT" | "PATTERN_RULE";
-
-// TODO: Add cause
-
-export class InvariantError extends Error {
-  readonly code = "INVARIANT" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "InvariantError";
-  }
-}
-
-export type DomainName = "bodice" | "draft";
+export type DomainName = "bodice";
 export type DomainStep = string;
 
 export class DomainError extends Error {

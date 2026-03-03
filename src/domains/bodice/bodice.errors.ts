@@ -1,4 +1,4 @@
-import { DomainError } from "../../core/utils/errors";
+import { DomainError } from "../../core/errors";
 
 export class BodiceError extends DomainError {
   constructor(message: string, details?: unknown) {
