@@ -1,12 +1,13 @@
-
 import type { Result } from "../core/errors";
-import { toPatternLayout } from "../core/pattern/pattern.context.toLayout";
-import type { PatternLayout } from "../core/pattern/pattern.types";
-import type { SloperMeasurementsMap, SloperType } from "../core/slopers/registry";
-import { Err, ResultWrapper as R } from "../core/utils/result";
+import { toPatternLayout } from "../core/pattern/layout/context.to-layout";
+import type { PatternLayout } from "../core/pattern/drafting/types";
+import type {
+  SloperMeasurementsMap,
+  SloperType,
+} from "../core/slopers/registry";
+import { Err, ResultWrapper as R } from "../core/errors/result";
 import { drafters } from "./drafters";
 import { fail, type DraftingError } from "./errors";
-
 
 export const draftSloper = <TKind extends SloperType>(
   kind: TKind,

@@ -1,4 +1,4 @@
-import type { CubicBezier, Line, Point } from "../geometry/geometry.types";
+import type { CubicBezier, Line, Point } from "../geometry/types";
 
 type DraftCanvasProps = {
   // points: BodicePoints;

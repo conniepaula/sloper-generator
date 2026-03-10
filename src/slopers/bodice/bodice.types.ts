@@ -1,4 +1,4 @@
-import type { Point } from "../../geometry/geometry.types";
+import type { Point } from "../../geometry/types";
 
 export type CircumferenceMeasurements = {
   bust: number; // measure at most voluminous part of bust
@@ -25,7 +25,8 @@ export type HorizontalMeasurements = {
 };
 
 export interface BodiceMeasurements
-  extends CircumferenceMeasurements,
+  extends
+    CircumferenceMeasurements,
     VerticalMeasurements,
     HorizontalMeasurements {}
 

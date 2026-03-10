@@ -1,5 +1,5 @@
-import { draftSloper } from "../application/draftSloper";
-import { MOCK_MEASUREMENTS as m } from "../domains/bodice/bodice.constants";
+import { draftSloper } from "../application/draft-sloper";
+import { MOCK_MEASUREMENTS as m } from "../slopers/bodice/bodice.constants";
 import { DraftCubicBezier } from "../render/DraftCanvas";
 import { SvgLine } from "../render/SvgLine";
 import { DraftCanvas } from "./components/DraftCanvas";

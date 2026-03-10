@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
-import type { BoundingBox } from "../../geometry/geometry.types";
+import type { BoundingBox } from "../../geometry/types";
 
 import { useCamera, type Pan } from "../hooks/useCamera";
-import { getBoundingBoxMetrics } from "../../geometry/geometry.helpers";
+import { getBoundingBoxMetrics } from "../../geometry/helpers";
 
 type DraftCanvasProps = {
   children: React.ReactNode;

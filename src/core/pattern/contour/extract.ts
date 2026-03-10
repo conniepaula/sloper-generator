@@ -1,5 +1,5 @@
-import { arePointsEqual } from "../../../geometry/geometry.helpers";
-import type { Point } from "../../../geometry/geometry.types";
+import { arePointsEqual } from "../../../geometry/helpers";
+import type { Point } from "../../../geometry/types";
 import { assertNonEmpty, assertNonNull } from "../../../shared/utils/assert";
 import { InvariantError } from "../../errors";
 import type { Contour, ContourCandidates, ContourSegment } from "./types";

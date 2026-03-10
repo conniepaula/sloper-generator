@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { clamp } from "../../core/utils/math";
+import { clamp } from "../../shared/utils/math";
 
 export type Pan = {
   x: number;

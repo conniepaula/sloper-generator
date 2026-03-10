@@ -32,7 +32,7 @@ To draft the patterns, I transformed my own real world pattern-making experience
 
   - Pure mathematical helpers to construct points, lines and vectors and perform explicit geometric transformations
 
-  - Pattern drafting helpers separated by drafting domain (bodice, skirt, sleeve, etc...) 
+  - Pattern drafting helpers separated by  sloper (bodice, skirt, sleeve, etc...) 
 
   - SVG-based rendering
 

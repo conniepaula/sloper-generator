@@ -1,5 +1,5 @@
-import type { NonEmptyArray } from "../core/utils/assert";
 import { InvariantError } from "../core/errors";
+import type { NonEmptyArray } from "../shared/utils/assert";
 import {
   AxisEnumMap,
   IntersectionRangeEnumMap,
@@ -11,7 +11,7 @@ import {
   type Line,
   type Point,
   type Vector,
-} from "./geometry.types";
+} from "./types";
 
 /**
  * Creates a vector from `point1` to `point2`.
@@ -405,3 +405,11 @@ export function getBoundingBoxMetrics(bounds: BoundingBox) {
 
   return { center, height, width };
 }
+
+export const arePointsEqual = (
+  a: Point,
+  b: Point,
+  eps: number = 1e-6,
+): boolean => {
+  return Math.abs(a.x - b.x) < eps && Math.abs(a.y - b.y) < eps;
+};

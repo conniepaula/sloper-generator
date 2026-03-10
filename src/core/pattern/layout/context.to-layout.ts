@@ -1,10 +1,10 @@
-import { InvariantError } from "../errors";
-import { type Result } from "../errors/Result";
-import { Err } from "../utils/result";
-import { composePatternLayout } from "./pattern.composeLayout";
-import { contextToPatternModel } from "./pattern.context.toModel";
-import type { PatternDraftingContextBase } from "./pattern.context.types";
-import type { PatternLayout } from "./pattern.types";
+import { InvariantError } from "../../errors";
+import { type Result } from "../../errors/result";
+import { Err } from "../../errors/result";
+import { composePatternLayout } from "./compose-layout";
+import { contextToPatternModel } from "../drafting/context.toModel";
+import type { PatternDraftingContextBase } from "../drafting/context.types";
+import type { PatternLayout } from "../drafting/types";
 
 type LayoutOptions = {
   spacing?: number;

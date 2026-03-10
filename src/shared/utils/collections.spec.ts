@@ -1,5 +1,5 @@
 import { describe, expect, it, expectTypeOf } from "vitest";
-import { typedEntries } from "./object";
+import { typedEntries } from "./collections";
 
 describe("typedEntries", () => {
   it("returns entries like Object.entries", () => {

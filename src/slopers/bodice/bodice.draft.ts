@@ -17,10 +17,10 @@ import {
   draftWaistBack,
   draftWaistFront,
 } from "./bodice.steps";
-import { walkSeams } from "../../core/pattern/pattern.helpers";
-import { DomainError, InvariantError, type Result  } from "../../core/errors";
-import { Err, Ok, } from "../../core/utils/result";
-import { BodiceError } from "./bodice.errors";
+import { walkSeams } from "../../core/pattern/drafting/helpers";
+import { DomainError, InvariantError, type Result } from "../../core/errors";
+import { Err, Ok } from "../../core/errors/result";
+import { mapDomainBoundaryError } from "../../core/errors/domain-boundary-error-mapper";
 
 const draftFrontBodice = (ctx: BodiceDraftContext) => {
   draftBaseFront(ctx);
@@ -44,7 +44,7 @@ const draftBackBodice = (ctx: BodiceDraftContext) => {
 
 export const draftBodice = (
   measurements: BodiceMeasurements,
-): Result<BodiceDraftContext, BodiceError | InvariantError | Error> => {
+): Result<BodiceDraftContext, DomainError | InvariantError> => {
   const ctx = createBodiceDraftContext(measurements);
 
   try {
@@ -58,7 +58,7 @@ export const draftBodice = (
       ],
       ctx.lines.back_sideSeam.geometry,
       {
-        domain: "bodice",
+        sloper: "bodice",
         errorMessage:
           "Bodice front and back side seam lengths are different. Check your measurements.",
       },
@@ -68,7 +68,7 @@ export const draftBodice = (
       ctx.lines.front_shoulder.geometry,
       ctx.lines.back_shoulder.geometry,
       {
-        domain: "bodice",
+        sloper: "bodice",
         errorMessage:
           "Bodice front and back shoulder lengths are different. Check your measurements.",
       },
@@ -76,17 +76,6 @@ export const draftBodice = (
 
     return Ok(ctx);
   } catch (err) {
-    if (err instanceof BodiceError || err instanceof InvariantError) {
-      return Err(err);
-    }
-    if (err instanceof DomainError) {
-      // error comes from shared domain utilities
-      return Err(new BodiceError(err.message, err.details));
-    }
-    return Err(
-      new Error("An unknown error occurred while drafting the bodice.", {
-        cause: err,
-      }),
-    );
+    Err(mapDomainBoundaryError(err, { sloper: "bodice", stage: "drafting" }));
   }
 };

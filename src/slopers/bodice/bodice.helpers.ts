@@ -1,4 +1,4 @@
-import type { Line, Point, Ray } from "../../geometry/geometry.types";
+import type { Line, Point, Ray } from "../../geometry/types";
 import {
   angleBetweenVectors,
   midPoint,
@@ -7,9 +7,9 @@ import {
   rotateAboutPoint,
   vectorFrom,
   intersection,
-} from "../../geometry/geometry.helpers";
+} from "../../geometry/helpers";
 import { ADDED_ARMSCYE_DEPTH, ORIGIN } from "./bodice.constants";
-import { BodiceError } from "./bodice.errors";
+import { bodiceDraftError } from "./errors";
 
 /**
  * Compute the bust dart intake (difference between front and back waist heights).
@@ -140,10 +140,11 @@ export const unfoldBustDart = (
   );
 
   if (splitPoint === null) {
-    throw new BodiceError(
-      "Invalid dart geometry: Fold boundary ray does not intersect with folded side seam line.",
-      "draftBustDartAndSideSeamFront",
-    );
+    throw bodiceDraftError({
+      message:
+        "Invalid dart geometry: Fold boundary ray does not intersect with folded side seam line.",
+      details: "draftBustDartAndSideSeamFront",
+    });
   }
 
   const topSideSeamSegment = {
@@ -224,10 +225,10 @@ export const createDartBulk = (
   );
 
   if (dartBulkIntersectionPoint === null) {
-    throw new BodiceError(
-      "Invalid bust dart geometry: Please check your measurements.",
-      "draftBustDartAndSideSeamFront",
-    );
+    throw bodiceDraftError({
+      message: "Invalid bust dart geometry: Please check your measurements.",
+      details: "draftBustDartAndSideSeamFront",
+    });
   }
 
   const stationaryDartBulkLine = {
@@ -294,10 +295,11 @@ export const traceBackSideSeam = (
   );
 
   if (armscyeSideSeamIntersection === null) {
-    throw new BodiceError(
-      "Invalid side seam geometry: Could not find intersection between side seam ray and armscye ray.",
-      "draftSideSeamBack",
-    );
+    throw bodiceDraftError({
+      message:
+        "Invalid side seam geometry: Could not find intersection between side seam ray and armscye ray.",
+      details: "draftSideSeamBack",
+    });
   }
 
   return { from: sideBackWaist, to: armscyeSideSeamIntersection };

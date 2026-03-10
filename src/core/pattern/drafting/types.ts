@@ -3,7 +3,7 @@ import type {
   CubicBezier,
   Line,
   // Point
-} from "../../geometry/geometry.types";
+} from "../../../geometry/types";
 
 export type Piece = "front" | "back";
 export type Role = "main_outer" | "main_inner" | "guide" | "construction";
@@ -23,11 +23,16 @@ export interface PatternCurve extends GeometryWrapper {
   geometry: CubicBezier;
 }
 
-interface LineEntity extends PatternLine {
+interface EntityOps {
+  id: string;
+  exportable: boolean;
+}
+
+export interface LineEntity extends PatternLine, EntityOps {
   kind: "line";
 }
 
-interface CurveEntity extends PatternCurve {
+export interface CurveEntity extends PatternCurve, EntityOps {
   kind: "curve";
 }
 
@@ -38,12 +43,11 @@ interface CurveEntity extends PatternCurve {
 //   value: string;
 // };
 
-export type Entity = {
-  id: string;
-  exportable: boolean;
-} & (LineEntity | CurveEntity);
+export type Entity = LineEntity | CurveEntity;
 
-export type DocumentEntities = Record<Piece, Array<Entity>>;
+export type Entities = Array<Entity>;
+
+export type DocumentEntities = Record<Piece, Entities>;
 
 export type PatternDocument = { entities: DocumentEntities };
 

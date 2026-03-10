@@ -1,4 +1,4 @@
-import type { CurveEntity, LineEntity } from "../pattern.types";
+import type { CurveEntity, LineEntity } from "../drafting/types";
 
 type ContourLine = Pick<LineEntity, "kind" | "geometry" | "id" | "exportable">;
 

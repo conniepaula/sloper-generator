@@ -1,4 +1,4 @@
-import type { PatternDraftingContextBase } from "../../core/pattern/pattern.context.types";
+import type { PatternDraftingContextBase } from "../../core/pattern/drafting/context.types";
 import type { BodiceMeasurements } from "./bodice.types";
 
 type BodicePoints =

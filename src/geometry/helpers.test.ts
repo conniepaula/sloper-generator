@@ -20,8 +20,9 @@ import {
   getBoundingBoxFromLines,
   orthogonallyProjectPointOntoLine,
   getBoundingBoxMetrics,
-} from "./geometry.helpers";
-import { assertNonEmpty } from "../core/utils/assert";
+  arePointsEqual,
+} from "./helpers";
+import { assertNonEmpty } from "../shared/utils/assert";
 
 describe("midPoint", () => {
   it("finds the correct point in the middle of two points", () => {
@@ -231,7 +232,6 @@ describe("translateLine", () => {
   });
 });
 
-
 describe("translateCurve", () => {
   it("translates all control points by given distances", () => {
     const curve = curvePoints({ x: 0, y: 0 }, { x: 5, y: 5 });
@@ -255,7 +255,6 @@ describe("translateCurve", () => {
     expect(translated.end).toEqual({ x: 10, y: 5 });
   });
 });
-
 
 describe("getBoundingBoxFromLines", () => {
   it("calculates bounding box for single line", () => {
@@ -308,7 +307,6 @@ describe("getBoundingBoxFromLines", () => {
     });
   });
 });
-
 
 describe("getBoundingBoxMetrics", () => {
   it("returns center, width and height for a normal bounding box", () => {
@@ -363,5 +361,42 @@ describe("getBoundingBoxMetrics", () => {
 
     expect(center.x).toBe(bounds.minX + width / 2);
     expect(center.y).toBe(bounds.minY + height / 2);
+  });
+});
+
+describe("arePointsEqual", () => {
+  it("returns true for identical coordinates", () => {
+    const a = { x: 10, y: 5 };
+    const b = { x: 10, y: 5 };
+
+    expect(arePointsEqual(a, b)).toBe(true);
+  });
+
+  it("returns false for clearly different points", () => {
+    const a = { x: 10, y: 5 };
+    const b = { x: 11, y: 5 };
+
+    expect(arePointsEqual(a, b)).toBe(false);
+  });
+
+  it("returns true when difference is within epsilon", () => {
+    const a = { x: 1, y: 1 };
+    const b = { x: 1 + 1e-7, y: 1 - 1e-7 };
+
+    expect(arePointsEqual(a, b)).toBe(true);
+  });
+
+  it("returns false when difference exceeds epsilon", () => {
+    const a = { x: 1, y: 1 };
+    const b = { x: 1.001, y: 1 };
+
+    expect(arePointsEqual(a, b)).toBe(false);
+  });
+
+  it("respects custom epsilon parameter", () => {
+    const a = { x: 1, y: 1 };
+    const b = { x: 1.0005, y: 1 };
+
+    expect(arePointsEqual(a, b, 0.001)).toBe(true);
   });
 });

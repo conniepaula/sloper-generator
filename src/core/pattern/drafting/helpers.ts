@@ -1,12 +1,11 @@
-import { assertNonEmpty } from "../utils/assert";
-import { DomainError } from "../errors";
+import { DomainError } from "../../errors";
 import {
   getBoundingBoxFromLines,
   lineLength,
   translateCurve,
   translateLine,
-} from "../../geometry/geometry.helpers";
-import type { CubicBezier, Line } from "../../geometry/geometry.types";
+} from "../../../geometry/helpers";
+import type { CubicBezier, Line } from "../../../geometry/types";
 import type {
   PatternCurve,
   Entity,
@@ -15,8 +14,9 @@ import type {
   Role,
   Seam,
   WithoutPiecePrefix,
-} from "./pattern.types";
-import type { DomainName } from "../slopers/registry";
+} from "./types";
+import type { SloperType } from "../../slopers/registry";
+import { assertNonEmpty } from "../../../shared/utils/assert";
 
 // TODO: Once aanchor points can be altered, separate line and curve options
 type AddOptions = {
@@ -179,7 +179,7 @@ export const getSeamLength = (seam: Seam) => {
 };
 
 interface WalkSeamsOpts {
-  domain: DomainName;
+  sloper: SloperType;
   diff?: number;
   errorMessage?: string;
   details?: string;
@@ -196,13 +196,9 @@ interface WalkSeamsOpts {
  * @param opts Optional parameter. Defaults to diff = 0.3, domain = "draft".
  * @returns A new entity with translated geometry.
  */
-export const walkSeams = (
-  seam1: Seam,
-  seam2: Seam,
-  opts: WalkSeamsOpts,
-) => {
+export const walkSeams = (seam1: Seam, seam2: Seam, opts: WalkSeamsOpts) => {
   const {
-    domain,
+    sloper,
     diff = 0.3,
     errorMessage = "Seam lengths too different. Check your measurements",
     details = "",
@@ -213,6 +209,6 @@ export const walkSeams = (
   const seamDiff = Math.abs(seam2Length - seam1Length);
 
   if (seamDiff > diff) {
-    throw new DomainError(errorMessage, domain, details);
+    throw new DomainError(errorMessage, { sloper, details, stage: "drafting" });
   }
 };

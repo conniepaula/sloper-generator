@@ -11,9 +11,8 @@ import {
   unfoldBustDart,
   traceBackSideSeam,
 } from "./bodice.helpers";
-import { rotateAboutPoint } from "../../geometry/geometry.helpers";
+import { rotateAboutPoint } from "../../geometry/helpers";
 import { FRONT_WAIST_DART_DEPTH } from "./bodice.constants";
-
 
 describe("armscyeLineHeight", () => {
   it("calculates correct armscye height from front waist height", () => {
@@ -129,7 +128,10 @@ describe("unfoldBustDart", () => {
       from: armscyeEnd,
       to: splitPoint,
     });
-    expect(unfolded.topDartLegLine).toEqual({ from: bustOrigin, to: splitPoint });
+    expect(unfolded.topDartLegLine).toEqual({
+      from: bustOrigin,
+      to: splitPoint,
+    });
 
     // bottom leg is rotation of splitPoint by angle about bustOrigin -> (0,2)
     expect(unfolded.bottomDartLegLine.to).toEqual(
@@ -163,4 +165,3 @@ describe("traceBackSideSeam", () => {
     expect(line.to).toEqual({ x: 3, y: 5 });
   });
 });
-

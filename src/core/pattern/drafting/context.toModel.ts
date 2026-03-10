@@ -1,6 +1,6 @@
-import { typedEntries } from "../utils/object";
-import type { PatternDocument, DocumentEntities } from "./pattern.types";
-import type { PatternDraftingContextBase } from "./pattern.context.types";
+import type { PatternDocument, DocumentEntities } from "./types";
+import type { PatternDraftingContextBase } from "./context.types";
+import { typedEntries } from "../../../shared/utils/collections";
 
 export const contextToPatternModel = <
   TMeasurements,

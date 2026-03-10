@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import type { Line } from "../geometry/geometry.types";
+import type { Line } from "../geometry/types";
 
 interface SvgLineProps extends SVGProps<SVGElement> {
   geometry: Line;

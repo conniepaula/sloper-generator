@@ -1,4 +1,4 @@
-import type { Entity, Piece, Role } from "../pattern.types";
+import type { Entity, Piece, Role } from "../drafting/types";
 
 export type Selector = { role?: Role; piece?: Piece };
 

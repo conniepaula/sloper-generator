@@ -1,10 +1,7 @@
-import {
-  DomainError,
-  InvariantError,
-  type ErrorCodes,
-} from "../core/errors";
-import type { SloperType } from "./types";
+import { DomainError, InvariantError, type ErrorCodes } from "../core/errors";
+import type { SloperType } from "../core/slopers/registry";
 
+// TODO: Evaluate what new name should be after adding DomainStage
 type DraftStage = "drafter" | "layout" | "exception";
 
 export type DraftingError = {
@@ -14,6 +11,7 @@ export type DraftingError = {
   details?: unknown;
 };
 
+// TODO: Evaluate whether I should be receiving stage and kind here
 /*
  * Given the stage where draftSloper failed and the type of sloper it was drafting, it returns DraftingError wrapped by Result.
  */
@@ -31,7 +29,7 @@ export const fail = (
     details: draftingErr.details,
   };
 
-  if (draftingErr.code === "PATTERN_RULE") {
+  if (draftingErr.code === "DOMAIN_ERROR") {
     console.warn(ctx);
   } else {
     console.error(ctx, err);
@@ -49,7 +47,7 @@ const toDraftingError = (err: unknown, stage: DraftStage): DraftingError => {
       code: err.code,
       message: err.message,
       stage,
-      details: { domain: err.domain, step: err.details },
+      details: { sloper: err.sloper, stage: err.stage },
     };
   }
   if (err instanceof InvariantError) {

@@ -1,4 +1,4 @@
-import type { Point } from "../../geometry/geometry.types";
+import type { Point } from "../../geometry/types";
 import type { BodiceMeasurements } from "./bodice.types";
 
 export const ORIGIN = { x: 0, y: 0 } as const satisfies Point;

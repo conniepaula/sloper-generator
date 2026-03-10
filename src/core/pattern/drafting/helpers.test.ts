@@ -10,14 +10,9 @@ import {
   walkSeams,
   computeBounds,
   getLineArrayLength,
-} from "./pattern.helpers";
-import type {
-  PatternCurve,
-  PatternLine,
-  Entity,
-} from "./pattern.types";
-import { curvePoints } from "../../geometry/geometry.helpers";
-
+} from "./helpers";
+import type { PatternCurve, PatternLine, Entity } from "./types";
+import { curvePoints } from "../../../geometry/helpers";
 
 describe("addLine", () => {
   it("correctly adds a line into the context with provided metadata", () => {
@@ -304,7 +299,6 @@ describe("getLineArrayLength", () => {
     expect(getLineArrayLength(lines)).toBeCloseTo(7);
   });
 });
-
 
 describe("getSeamLength", () => {
   it("correctly calculates length for seam array", () => {

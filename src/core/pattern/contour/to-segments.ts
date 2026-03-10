@@ -1,4 +1,4 @@
-import type { Entities, Entity } from "../pattern.types";
+import type { Entities, Entity } from "../drafting/types";
 import { matchesSelector, type Selector } from "./selectors";
 import type { ContourCandidates, ContourSegment } from "./types";
 

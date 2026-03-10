@@ -1,5 +1,5 @@
 import { partition } from "../../../shared/utils/collections";
-import type { Entities, PatternDocument } from "../pattern.types";
+import type { Entities, PatternDocument } from "../drafting/types";
 import { extractContour } from "./extract";
 import { toContourSegments } from "./to-segments";
 

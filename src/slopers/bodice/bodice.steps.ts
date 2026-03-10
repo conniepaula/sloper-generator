@@ -3,8 +3,8 @@ import {
   translatePoint,
   curvePoints,
   midPoint,
-} from "../../geometry/geometry.helpers";
-import { AxisEnumMap } from "../../geometry/geometry.types";
+} from "../../geometry/helpers";
+import { AxisEnumMap } from "../../geometry/types";
 
 import type { BodiceDraftContext } from "./bodice.context.types";
 import {
@@ -24,7 +24,7 @@ import {
   unfoldBustDart,
   waistLineLength,
 } from "./bodice.helpers";
-import { addCurve, addLine } from "../../core/pattern/pattern.helpers";
+import { addCurve, addLine } from "../../core/pattern/drafting/helpers";
 
 // DRAFTING STEPS - FRONT BODICE
 

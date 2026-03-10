@@ -1,5 +1,5 @@
-import { computeBounds, translateEntity } from "./pattern.helpers";
-import type { PatternDocument, PatternLayout } from "./pattern.types";
+import { computeBounds, translateEntity } from "../drafting/helpers";
+import type { PatternDocument, PatternLayout } from "../drafting/types";
 
 export const composePatternLayout = (
   document: PatternDocument,

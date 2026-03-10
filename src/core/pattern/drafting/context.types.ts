@@ -1,5 +1,5 @@
-import type { Point } from "../../geometry/geometry.types";
-import type { PatternCurve, PatternLine } from "./pattern.types";
+import type { Point } from "../../../geometry/types";
+import type { PatternCurve, PatternLine } from "./types";
 
 export type PatternDraftingContextBase<
   TMeasurements,
