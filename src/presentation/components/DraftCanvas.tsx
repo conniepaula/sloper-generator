@@ -1,20 +1,19 @@
-import { useLayoutEffect, useRef, useState } from "react";
-
-import type { BoundingBox } from "../../geometry/types";
+import { useLayoutEffect, useState } from "react";
 
 import { useCamera, type Pan } from "../hooks/useCamera";
-import { getBoundingBoxMetrics } from "../../geometry/helpers";
+import type { Bounds } from "../../core/pattern/drafting/types";
 
 type DraftCanvasProps = {
   children: React.ReactNode;
-  bounds: BoundingBox;
+  bounds: Bounds;
+  ref: React.RefObject<SVGSVGElement | null>;
 };
 
 export const DraftCanvas: React.FC<DraftCanvasProps> = ({
   children,
   bounds,
+  ref,
 }) => {
-  const svgRef = useRef<SVGSVGElement>(null);
   const [zoom, setZoom] = useState<number | null>(null);
   const [center, setCenter] = useState<Pan | null>(null);
   const [isSeeded, setIsSeeded] = useState(false);
@@ -26,15 +25,14 @@ export const DraftCanvas: React.FC<DraftCanvasProps> = ({
   });
 
   useLayoutEffect(() => {
-    if (!svgRef.current) return;
-    const { width, height } = svgRef.current.getBoundingClientRect();
-    const patternBbox = getBoundingBoxMetrics(bounds);
-    const zoomX = width / patternBbox.width;
-    const zoomY = height / patternBbox.height;
+    if (!ref.current) return;
+    const { width, height } = ref.current.getBoundingClientRect();
+    const zoomX = width / bounds.width;
+    const zoomY = height / bounds.height;
     const zoomFit = Math.min(zoomX, zoomY) * 0.9;
     setCenter({
-      x: width / 2 - patternBbox.center.x * zoomFit,
-      y: height / 2 - patternBbox.center.y * zoomFit,
+      x: width / 2 - bounds.center.x * zoomFit,
+      y: height / 2 - bounds.center.y * zoomFit,
     });
     setZoom(zoomFit);
     setIsSeeded(true);
@@ -42,12 +40,12 @@ export const DraftCanvas: React.FC<DraftCanvasProps> = ({
 
   return (
     <svg
-      ref={svgRef}
+      ref={ref}
+      id="svg-canvas"
       className="h-screen w-screen bg-amber-200"
       onMouseDown={handlers.onMouseDown}
       onWheel={handlers.onWheel}
       shapeRendering="geometricPrecision"
-      // viewBox="-5 -5 30 90"
     >
       <g transform={transform}>{children}</g>
     </svg>
