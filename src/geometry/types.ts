@@ -81,3 +81,9 @@ export type BoundingBox = {
   minY: number;
   maxY: number;
 };
+
+export type BoundingBoxMetrics = {
+  center: Point;
+  height: number;
+  width: number;
+};
