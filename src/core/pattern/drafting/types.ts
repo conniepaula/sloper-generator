@@ -1,5 +1,6 @@
 import type {
   BoundingBox,
+  BoundingBoxMetrics,
   CubicBezier,
   Line,
   // Point
@@ -51,14 +52,16 @@ export type DocumentEntities = Record<Piece, Entities>;
 
 export type PatternDocument = { entities: DocumentEntities };
 
+export type Bounds = BoundingBox & BoundingBoxMetrics;
+
 type PerPieceProps = {
   indices: { start: number; count: number };
-  bounds: BoundingBox;
+  bounds: Bounds;
 };
 
 export interface PatternLayout {
   entities: Array<Entity>;
-  bounds: BoundingBox;
+  bounds: Bounds;
   perPiece: Record<Piece, PerPieceProps>;
 }
 

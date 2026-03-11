@@ -1,3 +1,4 @@
+import { getBoundingBoxMetrics } from "../../../geometry/helpers";
 import { computeBounds, translateEntity } from "../drafting/helpers";
 import type { PatternDocument, PatternLayout } from "../drafting/types";
 
@@ -8,9 +9,10 @@ export const composePatternLayout = (
   const { front, back } = document.entities;
 
   // get front bounding box
-  const frontBoundingBox = computeBounds(front);
+  const frontBbox = computeBounds(front);
+  const frontBboxMetrics = getBoundingBoxMetrics(frontBbox);
   // calculate x offset:
-  const xOffset = frontBoundingBox.maxX + spacing;
+  const xOffset = frontBbox.maxX + spacing;
 
   // TODO: Work on y offset logic
   const yOffset = 0;
@@ -20,23 +22,25 @@ export const composePatternLayout = (
   );
 
   // get translatedBack bounding box
-  const backBoundingBox = computeBounds(translatedBack);
+  const backBbox = computeBounds(translatedBack);
+  const backBboxMetrics = getBoundingBoxMetrics(backBbox);
 
   // get full layout bounding box
   const layoutEntities = [...front, ...translatedBack];
-  const layoutBoundingBox = computeBounds(layoutEntities);
+  const layoutBbox = computeBounds(layoutEntities);
+  const layoutBboxMetrics = getBoundingBoxMetrics(layoutBbox);
 
   return {
     entities: layoutEntities,
-    bounds: layoutBoundingBox,
+    bounds: { ...layoutBbox, ...layoutBboxMetrics },
     perPiece: {
       front: {
         indices: { start: 0, count: front.length },
-        bounds: frontBoundingBox,
+        bounds: { ...frontBbox, ...frontBboxMetrics },
       },
       back: {
         indices: { start: front.length, count: translatedBack.length },
-        bounds: backBoundingBox,
+        bounds: { ...backBbox, ...backBboxMetrics },
       },
     },
   };

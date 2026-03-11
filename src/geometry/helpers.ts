@@ -4,6 +4,7 @@ import {
   AxisEnumMap,
   IntersectionRangeEnumMap,
   type BoundingBox,
+  type BoundingBoxMetrics,
   type CubicBezier,
   type CurveControl,
   type Intersection,
@@ -395,7 +396,7 @@ export function getBoundingBoxFromLines(
 /**
  * Calculates the center point, width and height of a bounding box.
  */
-export function getBoundingBoxMetrics(bounds: BoundingBox) {
+export function getBoundingBoxMetrics(bounds: BoundingBox): BoundingBoxMetrics {
   const minPoint = { x: bounds.minX, y: bounds.minY };
   const maxPoint = { x: bounds.maxX, y: bounds.maxY };
 
