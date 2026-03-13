@@ -4,7 +4,7 @@ import type {
   LinesRecord,
   PointsRecord,
 } from "./bodice.context.types";
-import type { BodiceMeasurements } from "./bodice.types";
+import type { BodiceMeasurements } from "./measurements/schema";
 
 export const createBodiceDraftContext = (
   measurements: BodiceMeasurements,

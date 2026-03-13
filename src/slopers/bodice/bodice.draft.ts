@@ -1,4 +1,3 @@
-import type { BodiceMeasurements } from "./bodice.types";
 import type { BodiceDraftContext } from "./bodice.context.types";
 import { createBodiceDraftContext } from "./bodice.context";
 import {
@@ -21,6 +20,7 @@ import { walkSeams } from "../../core/pattern/drafting/helpers";
 import { DomainError, InvariantError, type Result } from "../../core/errors";
 import { Err, Ok } from "../../core/errors/result";
 import { mapDomainBoundaryError } from "../../core/errors/domain-boundary-error-mapper";
+import type { BodiceMeasurements } from "./measurements/schema";
 
 const draftFrontBodice = (ctx: BodiceDraftContext) => {
   draftBaseFront(ctx);
@@ -76,6 +76,8 @@ export const draftBodice = (
 
     return Ok(ctx);
   } catch (err) {
-    Err(mapDomainBoundaryError(err, { sloper: "bodice", stage: "drafting" }));
+    return Err(
+      mapDomainBoundaryError(err, { sloper: "bodice", stage: "drafting" }),
+    );
   }
 };
