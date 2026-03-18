@@ -1,4 +1,5 @@
 import type {
+  HTMLAttributes,
   InputHTMLAttributes,
   LabelHTMLAttributes,
   ReactNode,
@@ -57,8 +58,13 @@ const Label = (props: LabelProps) => {
   );
 };
 
-const Error = ({ children }: { children?: ReactNode }) => {
-  return <p className="text-xs text-red-500 italic">{children}</p>;
+const Error = (props: HTMLAttributes<HTMLSpanElement>) => {
+  const { children, ...rest } = props;
+  return (
+    <span className="text-xs text-red-500 italic" role="alert" {...rest}>
+      {children}
+    </span>
+  );
 };
 
 FormField.Root = FormField;

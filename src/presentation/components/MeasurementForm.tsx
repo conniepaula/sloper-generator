@@ -33,6 +33,10 @@ export const MeasurementForm = <T extends FieldValues>(
     resolver: zodResolver(schema),
     defaultValues: defaultValue,
   });
+  const {
+    register,
+    formState: { errors },
+  } = methods;
 
   const shape = schema.shape;
 
@@ -48,12 +52,17 @@ export const MeasurementForm = <T extends FieldValues>(
             {typedEntries(shape).map(([id, opts]) => (
               <FormField.Root key={id}>
                 {/*TODO: Add tooltip with how to measure*/}
-                {opts.meta()?.title && (
-                  <FormField.Label>{opts.meta()?.title}</FormField.Label>
-                )}
-                <FormField.Input register={methods.register} name={id} />
+                <FormField.Label htmlFor={id}>
+                  {opts.meta()?.title}
+                </FormField.Label>
+                <FormField.Input
+                  register={register}
+                  name={id}
+                  id={id}
+                  aria-invalid={errors[id] ? "true" : "false"}
+                />
                 <ErrorMessage
-                  errors={methods.formState.errors}
+                  errors={errors}
                   name={id}
                   render={({ message }) => (
                     <FormField.Error>{message}</FormField.Error>
@@ -62,7 +71,10 @@ export const MeasurementForm = <T extends FieldValues>(
               </FormField.Root>
             ))}
           </div>
-          <Button formAction="submit">Generate</Button>
+          {/*TODO: Fix clipped outline/ring when active*/}
+          <Button formAction="submit" type="button" id="submitButton">
+            Generate
+          </Button>
         </Form>
       </FormProvider>
     </div>
