@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { ErrorMessage } from "@hookform/error-message";
 import {
   useForm,
@@ -38,15 +39,23 @@ export const MeasurementForm = <T extends FieldValues>(
   });
   const {
     register,
-    formState: { errors },
+    formState: { errors, isDirty, isSubmitting },
+    reset,
   } = methods;
 
   const shape = schema.shape;
 
+  const handleFormSubmit = (data: T) => {
+    if (!isDirty) return;
+
+    onSubmit(data);
+    reset(data);
+  };
+
   return (
     <FormProvider {...methods}>
       <Form
-        onSubmit={onSubmit}
+        onSubmit={handleFormSubmit}
         className="flex flex-col gap-6 md:overflow-y-hidden"
       >
         <div className="flex flex-1 flex-col gap-2 md:overflow-y-scroll">
@@ -66,6 +75,7 @@ export const MeasurementForm = <T extends FieldValues>(
                         icon={Info}
                         iconProps={{ size: 18, className: "text-gray-700" }}
                         aria-label={`More information on how to measure ${title}`}
+                        type="button"
                       />
                     </Tooltip>
                   </div>
@@ -91,7 +101,12 @@ export const MeasurementForm = <T extends FieldValues>(
           })}
         </div>
         {/*TODO: Fix clipped outline/ring when active*/}
-        <Button formAction="submit" type="submit" id="submitButton">
+        <Button
+          formAction="submit"
+          type="submit"
+          id="submitButton"
+          disabled={!isDirty || isSubmitting}
+        >
           Generate
         </Button>
       </Form>
