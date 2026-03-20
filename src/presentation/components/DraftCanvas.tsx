@@ -42,7 +42,7 @@ export const DraftCanvas: React.FC<DraftCanvasProps> = ({
     <svg
       ref={ref}
       id="svg-canvas"
-      className="h-screen w-screen bg-amber-200"
+      className="h-screen w-screen"
       onMouseDown={handlers.onMouseDown}
       onWheel={handlers.onWheel}
       shapeRendering="geometricPrecision"

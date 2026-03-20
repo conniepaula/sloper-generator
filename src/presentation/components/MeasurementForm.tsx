@@ -44,20 +44,19 @@ export const MeasurementForm = <T extends FieldValues>(
   const shape = schema.shape;
 
   return (
-    <div className="absolute top-0 right-0 mt-2 mr-2 mb-4 flex h-96 w-96 flex-col gap-4 rounded bg-slate-100 px-6 py-4">
-      <h1 className="text-xl font-bold">{title}</h1>
-      <FormProvider {...methods}>
-        <Form
-          onSubmit={onSubmit}
-          className="flex flex-col gap-6 overflow-y-hidden"
-        >
-          <div className="flex flex-1 flex-col gap-2 overflow-y-scroll">
-            {typedEntries(shape).map(([id, opts]) => {
-              const { title, description } = opts.meta() ?? {};
-              return (
-                <FormField.Root key={id}>
-                  <div className="flex items-center justify-between">
-                    <FormField.Label htmlFor={id}>{title}</FormField.Label>
+    <FormProvider {...methods}>
+      <Form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-6 md:overflow-y-hidden"
+      >
+        <div className="flex flex-1 flex-col gap-2 md:overflow-y-scroll">
+          {typedEntries(shape).map(([id, opts]) => {
+            const { title, description } = opts.meta() ?? {};
+            return (
+              <FormField.Root key={id}>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <FormField.Label htmlFor={id}>{title}</FormField.Label>
+                  <div className="hidden md:block">
                     <Tooltip
                       tooltipContent={
                         <span className="text-center">{description}</span>
@@ -65,34 +64,37 @@ export const MeasurementForm = <T extends FieldValues>(
                     >
                       <IconButton
                         icon={Info}
-                        iconProps={{ size: 18, className: "text-slate-700" }}
+                        iconProps={{ size: 18, className: "text-gray-700" }}
                         aria-label={`More information on how to measure ${title}`}
                       />
                     </Tooltip>
                   </div>
-                  <FormField.Input
-                    register={register}
-                    name={id}
-                    id={id}
-                    aria-invalid={errors[id] ? "true" : "false"}
-                  />
-                  <ErrorMessage
-                    errors={errors}
-                    name={id}
-                    render={({ message }) => (
-                      <FormField.Error>{message}</FormField.Error>
-                    )}
-                  />
-                </FormField.Root>
-              );
-            })}
-          </div>
-          {/*TODO: Fix clipped outline/ring when active*/}
-          <Button formAction="submit" type="submit" id="submitButton">
-            Generate
-          </Button>
-        </Form>
-      </FormProvider>
-    </div>
+                  <span className="mb-1 block text-xs md:hidden">
+                    {description}
+                  </span>
+                </div>
+                <FormField.Input
+                  register={register}
+                  name={id}
+                  id={id}
+                  aria-invalid={errors[id] ? "true" : "false"}
+                />
+                <ErrorMessage
+                  errors={errors}
+                  name={id}
+                  render={({ message }) => (
+                    <FormField.Error>{message}</FormField.Error>
+                  )}
+                />
+              </FormField.Root>
+            );
+          })}
+        </div>
+        {/*TODO: Fix clipped outline/ring when active*/}
+        <Button formAction="submit" type="submit" id="submitButton">
+          Generate
+        </Button>
+      </Form>
+    </FormProvider>
   );
 };

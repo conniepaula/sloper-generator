@@ -1,20 +1,36 @@
-import type { LucideIcon } from "lucide-react";
-import type { ComponentProps, ComponentPropsWithRef, ElementType } from "react";
+import type { LucideIcon, LucideProps } from "lucide-react";
+import type { ComponentPropsWithRef, ElementType } from "react";
+import { cn } from "../../utils/cn";
 
-type IconButtonProps<T extends ElementType = "button"> = {
+type IconButtonOwnProps = {
   icon: LucideIcon;
-  iconProps?: ComponentProps<LucideIcon>;
+  iconProps?: LucideProps;
+  children?: never;
+  "aria-label": string;
+  className?: string;
+};
+
+type IconButtonProps<T extends ElementType = "button"> = IconButtonOwnProps & {
   as?: T;
-} & ComponentPropsWithRef<T>;
+} & Omit<ComponentPropsWithRef<T>, keyof IconButtonOwnProps | "as">;
 
 // TODO: Improve styling
 export const IconButton = <T extends ElementType = "button">(
   props: IconButtonProps<T>,
 ) => {
-  const { icon: Icon, iconProps, as: Component = "button", ...rest } = props;
+  const {
+    icon: Icon,
+    iconProps = { size: 18 },
+    as: Component = "button",
+    className,
+    ...rest
+  } = props;
   return (
     <Component
-      className="rounded-full bg-slate-200 focus:ring focus:ring-rose-300 focus:outline-none"
+      className={cn(
+        "rounded-full bg-gray-200 focus:ring focus:ring-rose-300 focus:outline-none",
+        className,
+      )}
       {...rest}
     >
       <Icon {...iconProps} />
