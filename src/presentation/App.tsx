@@ -6,11 +6,17 @@ import { DraftCubicBezier } from "../render/DraftCanvas";
 import { SvgLine } from "../render/SvgLine";
 import { DraftCanvas } from "./components/DraftCanvas";
 import { exportPdf } from "../application/export/export-pdf";
+import { MeasurementForm } from "./components/MeasurementForm";
+import type { SloperType } from "../core/slopers/registry";
 
 function App() {
   // THIS PAGE IS BEING USED FOR _TESTING_, not the final product!
-  const result = draftSloper("bodice", m);
+  const sloper: SloperType = "bodice";
+  const result = draftSloper(sloper, m);
   const svgRef = useRef<SVGSVGElement>(null);
+  // const onSubmit: SubmitHandler<SloperMeasurementsMap[typeof sloper]> = (data) => console.log(data)
+
+  const onFormSubmit = (data) => console.log(data);
 
   if (!result.ok) {
     return (
@@ -32,6 +38,11 @@ function App() {
 
   return (
     <main className="">
+      <MeasurementForm
+        title="Bodice Measurements"
+        onSubmit={onFormSubmit}
+        sloperType={sloper}
+      />
       <div>
         <button
           onClick={handleExport}

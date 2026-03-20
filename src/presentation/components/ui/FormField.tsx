@@ -35,12 +35,11 @@ export const Input = <T extends FieldValues>(props: InputProps<T>) => {
 };
 
 interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
-  children: ReactNode;
   required?: boolean;
 }
 
 const Label = (props: LabelProps) => {
-  const { children, required = true, ...rest } = props;
+  const { required = true, ...rest } = props;
   return (
     <ConditionalWrap
       condition={required}
@@ -51,19 +50,17 @@ const Label = (props: LabelProps) => {
         </div>
       )}
     >
-      <label className="block w-fit text-sm font-bold text-gray-700" {...rest}>
-        {children}
-      </label>
+      <label
+        className="block w-fit text-sm font-bold text-gray-700"
+        {...rest}
+      />
     </ConditionalWrap>
   );
 };
 
 const Error = (props: HTMLAttributes<HTMLSpanElement>) => {
-  const { children, ...rest } = props;
   return (
-    <span className="text-xs text-red-500 italic" role="alert" {...rest}>
-      {children}
-    </span>
+    <span className="text-xs text-red-500 italic" role="alert" {...props} />
   );
 };
 

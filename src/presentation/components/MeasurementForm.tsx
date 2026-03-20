@@ -6,6 +6,7 @@ import {
   type SubmitHandler,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Info } from "lucide-react";
 
 import { FormField } from "./ui/FormField";
 import {
@@ -15,6 +16,8 @@ import {
 import { Form } from "./ui/Form";
 import { typedEntries } from "../../shared/utils/collections";
 import { Button } from "./ui/Button";
+import { Tooltip } from "./ui/Tooltip";
+import { IconButton } from "./ui/IconButton";
 
 interface MeasurementFormProps<T extends FieldValues> {
   title: string;
@@ -49,30 +52,43 @@ export const MeasurementForm = <T extends FieldValues>(
           className="flex flex-col gap-6 overflow-y-hidden"
         >
           <div className="flex flex-1 flex-col gap-2 overflow-y-scroll">
-            {typedEntries(shape).map(([id, opts]) => (
-              <FormField.Root key={id}>
-                {/*TODO: Add tooltip with how to measure*/}
-                <FormField.Label htmlFor={id}>
-                  {opts.meta()?.title}
-                </FormField.Label>
-                <FormField.Input
-                  register={register}
-                  name={id}
-                  id={id}
-                  aria-invalid={errors[id] ? "true" : "false"}
-                />
-                <ErrorMessage
-                  errors={errors}
-                  name={id}
-                  render={({ message }) => (
-                    <FormField.Error>{message}</FormField.Error>
-                  )}
-                />
-              </FormField.Root>
-            ))}
+            {typedEntries(shape).map(([id, opts]) => {
+              const { title, description } = opts.meta() ?? {};
+              return (
+                <FormField.Root key={id}>
+                  <div className="flex items-center justify-between">
+                    <FormField.Label htmlFor={id}>{title}</FormField.Label>
+                    <Tooltip
+                      tooltipContent={
+                        <span className="text-center">{description}</span>
+                      }
+                    >
+                      <IconButton
+                        icon={Info}
+                        iconProps={{ size: 18, className: "text-slate-700" }}
+                        aria-label={`More information on how to measure ${title}`}
+                      />
+                    </Tooltip>
+                  </div>
+                  <FormField.Input
+                    register={register}
+                    name={id}
+                    id={id}
+                    aria-invalid={errors[id] ? "true" : "false"}
+                  />
+                  <ErrorMessage
+                    errors={errors}
+                    name={id}
+                    render={({ message }) => (
+                      <FormField.Error>{message}</FormField.Error>
+                    )}
+                  />
+                </FormField.Root>
+              );
+            })}
           </div>
           {/*TODO: Fix clipped outline/ring when active*/}
-          <Button formAction="submit" type="button" id="submitButton">
+          <Button formAction="submit" type="submit" id="submitButton">
             Generate
           </Button>
         </Form>
