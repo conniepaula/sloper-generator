@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { draftSloper } from "../application/draft-sloper";
 import { MOCK_MEASUREMENTS as m } from "../slopers/bodice/bodice.constants";
@@ -8,15 +8,19 @@ import { DraftCanvas } from "./components/DraftCanvas";
 import { exportPdf } from "../application/export/export-pdf";
 import { MeasurementForm } from "./components/MeasurementForm";
 import type { SloperType } from "../core/slopers/registry";
+import type { BodiceMeasurements } from "../slopers/bodice/measurements/schema";
 
 function App() {
   // THIS PAGE IS BEING USED FOR _TESTING_, not the final product!
+  const [measurements, setMeasurements] = useState<BodiceMeasurements>(m);
   const sloper: SloperType = "bodice";
-  const result = draftSloper(sloper, m);
+  const result = draftSloper(sloper, measurements);
   const svgRef = useRef<SVGSVGElement>(null);
   // const onSubmit: SubmitHandler<SloperMeasurementsMap[typeof sloper]> = (data) => console.log(data)
 
-  const onFormSubmit = (data) => console.log(data);
+  const onFormSubmit = (data: BodiceMeasurements) => {
+    setMeasurements(data);
+  };
 
   if (!result.ok) {
     return (
