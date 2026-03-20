@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import "svg2pdf.js";
 
 import { pdfSize, type PdfSize } from "./constants";
 import { cloneSvg } from "./clone-svg";

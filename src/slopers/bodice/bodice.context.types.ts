@@ -1,5 +1,5 @@
 import type { PatternDraftingContextBase } from "../../core/pattern/drafting/context.types";
-import type { BodiceMeasurements } from "./bodice.types";
+import type { BodiceMeasurements } from "./measurements/schema";
 
 type BodicePoints =
   | "front_centerTop"
