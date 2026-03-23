@@ -15,15 +15,26 @@ import { Button } from "./components/ui/Button";
 import { toast } from "./utils/toast";
 import { ERROR_TOAST_DESCRIPTION, ERROR_TOAST_TITLE } from "./constants";
 
+interface DraftState {
+  measurements: BodiceMeasurements;
+  result: ReturnType<typeof draftSloper>;
+}
+
 function App() {
   // THIS PAGE IS BEING USED FOR _TESTING_, not the final product!
-  const [measurements, setMeasurements] = useState<BodiceMeasurements>(m);
+  const [draftState, setDraftState] = useState<DraftState>(() => ({
+    measurements: m,
+    result: draftSloper("bodice", m),
+  }));
+
+  const { result } = draftState;
+
   const sloper: SloperType = "bodice";
-  const result = draftSloper(sloper, measurements);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const onFormSubmit = (data: BodiceMeasurements) => {
-    setMeasurements(data);
+    const result = draftSloper(sloper, data);
+    setDraftState({ measurements: data, result });
     if (!result.ok) {
       toast({
         title: ERROR_TOAST_TITLE[result.error.code],
@@ -32,23 +43,12 @@ function App() {
     }
   };
 
-  // if (!result.ok) {
-  //   return (
-  //     <div className="flex h-screen w-screen flex-col items-center justify-center">
-  //       <h2 className="text-2xl font-bold">Draft failed</h2>
-  //       <p>
-  //         <strong>{result.error.code}</strong>: {result.error.message}
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   const handleExport = () => {
     if (!result.ok) return;
     const svg = svgRef.current;
     if (!svg) return;
 
-    exportPdf(svg, result.data.bounds, { size: "a4" });
+    exportPdf(svg, result.data.bounds);
   };
 
   return (
@@ -100,7 +100,7 @@ function App() {
                                 : `#D8D8D8`
                               : "transparent"
                           }
-                          // strokeDasharray={role === "guide" ? 0.3 : 0}
+                          strokeDasharray={role === "guide" ? 0.3 : 0}
                           geometry={geometry}
                         />
                       );
