@@ -81,7 +81,7 @@ export const exportPdf = async (
 
       doc.restoreGraphicsState();
 
-      if (size === "a4") {
+      if (size !== "a0") {
         drawPageNumber(doc, pageWidth, pageHeight, pageCount);
         drawAssemblyGuides(doc, margin, pageWidth, pageHeight);
       }
