@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "react-router dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,6 +14,7 @@
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-router/node": "^7.13.2",
     "@tailwindcss/vite": "^4.1.18",
     "clsx": "^2.1.1",
     "jspdf": "^4.2.0",
@@ -21,14 +22,17 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.1",
+    "react-router": "^7.13.2",
     "sonner": "^2.0.7",
     "svg2pdf.js": "^2.7.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.1.18",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "isbot": "^5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@react-router/dev": "^7.13.2",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
