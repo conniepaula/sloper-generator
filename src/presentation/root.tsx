@@ -45,6 +45,10 @@ export function ErrorBoundary() {
   return <ErrorPage error={error} />;
 }
 
+export function HydrateFallback() {
+  return <p>Loading Sloper Generator...</p>;
+}
+
 export default function Root() {
   return <Outlet />;
 }
