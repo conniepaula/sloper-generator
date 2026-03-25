@@ -20,12 +20,15 @@ import {
  * The resulting vector represents the displacement needed
  * to move from `point1` to `point2`.
  */
+
 export const vectorFrom = (point1: Point, point2: Point): Vector => {
   const dx = point2.x - point1.x;
   const dy = point2.y - point1.y;
 
   return { x: dx, y: dy };
 };
+
+vectorFrom("hello", "hello");
 
 /**
  * Computes the magnitude (length) of a vector.
