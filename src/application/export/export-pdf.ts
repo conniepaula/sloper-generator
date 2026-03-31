@@ -70,8 +70,6 @@ export const exportPdf = async (
       doc.clip();
       doc.discardPath();
 
-      pageCount++;
-
       await doc.svg(clone, {
         x,
         y,
@@ -84,6 +82,7 @@ export const exportPdf = async (
       if (size !== "a0") {
         drawPageNumber(doc, pageWidth, pageHeight, pageCount);
         drawAssemblyGuides(doc, margin, pageWidth, pageHeight);
+        pageCount++;
       }
     }
   }

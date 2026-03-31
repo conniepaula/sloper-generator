@@ -1,17 +1,20 @@
 import type { SVGProps } from "react";
-import type { Point } from "../../../geometry/types";
-import { stroke, type StrokeVariants } from "../../styles/stroke.variants";
 
-interface CurveProps
-  extends Omit<SVGProps<SVGPathElement>, "d" | "end">, StrokeVariants {
+import type { Point } from "../../../geometry/types";
+import { getStrokeVariant } from "../../styles/stroke.variants";
+import type { Role } from "../../../core/pattern/drafting/types";
+
+interface CurveProps extends Omit<SVGProps<SVGPathElement>, "d" | "end"> {
   start: Point;
   end: Point;
   control1: Point;
   control2: Point;
+  role: Role;
 }
 
 export const Curve = (props: CurveProps) => {
-  const { start, control1, control2, end, intent, className, ...rest } = props;
+  const { start, control1, control2, end, role, ...rest } = props;
+  const variant = getStrokeVariant(role);
   return (
     <path
       d={`
@@ -20,7 +23,7 @@ export const Curve = (props: CurveProps) => {
       ${control2.x} ${control2.y},
       ${end.x} ${end.y}
   `}
-      className={stroke({ intent }, className)}
+      {...variant}
       {...rest}
     />
   );
