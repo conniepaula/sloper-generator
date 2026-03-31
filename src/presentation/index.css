@@ -12,3 +12,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/*@theme */
+@theme {
+  --color-background: oklch(98.5% 0.001 106.423);
+  --color-foreground: oklch(26.8% 0.007 34.298);
+  --color-card: oklch(97% 0.001 106.424);
+  --color-card-foreground: oklch(25.7% 0.09 281.288);
+  --color-primary: oklch(78.5% 0.115 274.713);
+  --color-primary-dark: oklch(58.5% 0.233 277.117);
+  --color-primary-light: oklch(93% 0.034 272.788);
+  --color-primary-foreground: oklch(26.8% 0.007 34.298);
+  --color-neutral: oklch(86.9% 0.005 56.366);
+  --color-neutral-foreground: oklch(20.5% 0 0);
+  --color-error: oklch(64.5% 0.246 16.439);
+  --color-success: oklch(79.2% 0.209 151.711);
+  --color-sidebar: oklch(97% 0.001 106.424);
+  --color-sidebar-foreground: oklch(25.7% 0.09 281.288);
+}
