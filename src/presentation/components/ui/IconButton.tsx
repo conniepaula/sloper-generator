@@ -1,14 +1,15 @@
 import type { LucideIcon, LucideProps } from "lucide-react";
 import type { ComponentPropsWithRef, ElementType } from "react";
-import { cn } from "../../utils/cn";
 
-type IconButtonOwnProps = {
+import { button, type ButtonVariants } from "../../styles/button.variants";
+
+interface IconButtonOwnProps extends Omit<ButtonVariants, "size"> {
   icon: LucideIcon;
   iconProps?: LucideProps;
   children?: never;
   "aria-label": string;
   className?: string;
-};
+}
 
 type IconButtonProps<T extends ElementType = "button"> = IconButtonOwnProps & {
   as?: T;
@@ -23,14 +24,12 @@ export const IconButton = <T extends ElementType = "button">(
     iconProps = { size: 18 },
     as: Component = "button",
     className,
+    intent = "neutral",
     ...rest
   } = props;
   return (
     <Component
-      className={cn(
-        "rounded-full bg-gray-200 focus:ring focus:ring-rose-300 focus:outline-none",
-        className,
-      )}
+      className={button({ intent, size: "icon" }, className)}
       {...rest}
     >
       <Icon {...iconProps} />

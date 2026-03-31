@@ -1,4 +1,3 @@
-import * as z from "zod";
 import { ErrorMessage } from "@hookform/error-message";
 import {
   useForm,
@@ -21,7 +20,6 @@ import { Tooltip } from "./ui/Tooltip";
 import { IconButton } from "./ui/IconButton";
 
 interface MeasurementFormProps<T extends FieldValues> {
-  title: string;
   onSubmit: SubmitHandler<T>;
   sloperType: SloperType;
 }
@@ -29,7 +27,7 @@ interface MeasurementFormProps<T extends FieldValues> {
 export const MeasurementForm = <T extends FieldValues>(
   props: MeasurementFormProps<T>,
 ) => {
-  const { title, sloperType, onSubmit } = props;
+  const { sloperType, onSubmit } = props;
   const { schema, defaultValue } = getMeasurementsSchema(sloperType);
 
   const methods = useForm({
@@ -106,6 +104,7 @@ export const MeasurementForm = <T extends FieldValues>(
           type="submit"
           id="submitButton"
           disabled={!isDirty || isSubmitting}
+          className="lg:w-32 lg:self-end"
         >
           Generate
         </Button>
