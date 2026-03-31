@@ -27,7 +27,7 @@ export const Input = <T extends FieldValues>(props: InputProps<T>) => {
   const { register, name, ...rest } = props;
   return (
     <input
-      className="appearance-none rounded border bg-white px-3 py-2 leading-tight text-gray-700 shadow focus:ring focus:ring-rose-300 focus:outline-none"
+      className="bg-background focus:ring-primary appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:ring focus:outline-none"
       {...register(name)}
       {...rest}
     />
@@ -46,16 +46,16 @@ const Label = (props: LabelProps) => {
       wrap={(label) => (
         <div className="flex w-fit gap-1">
           {label}
-          <span className="text-rose-700" aria-label="Form field is required.">
+          <span
+            className="text-primary-dark"
+            aria-label="Form field is required."
+          >
             *
           </span>
         </div>
       )}
     >
-      <label
-        className="block w-fit text-sm font-bold text-gray-800"
-        {...rest}
-      />
+      <label className="block w-fit text-sm font-bold" {...rest} />
     </ConditionalWrap>
   );
 };
