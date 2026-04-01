@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download, SquareArrowRightExit } from "lucide-react";
 import { useRef, useState } from "react";
 import { Toaster } from "sonner";
 
@@ -16,6 +16,7 @@ import { toast } from "../utils/toast";
 import { Canvas } from "../components/svg/Canvas";
 import { Card } from "../components/ui/Card";
 import { MetaWrapper } from "../components/layout/MetaWrapper";
+import { ExportOptionsDialog } from "../components/ExportOptionsDialog";
 
 interface DraftState {
   measurements: BodiceMeasurements;
@@ -28,6 +29,7 @@ const BodicePage = () => {
     measurements: m,
     result: draftSloper("bodice", m),
   }));
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { result } = draftState;
 
@@ -45,12 +47,12 @@ const BodicePage = () => {
     }
   };
 
-  const handleExport = () => {
-    if (!result.ok) return;
-    const svg = svgRef.current;
-    if (!svg) return;
+  const handleExportClick = () => {
+    setIsDialogOpen(true);
+  };
 
-    exportPdf(svg, result.data.bounds, { size: "a4" });
+  const handleCloseExportDialog = () => {
+    setIsDialogOpen(false);
   };
 
   return (
@@ -75,28 +77,30 @@ const BodicePage = () => {
               </p>
             </Card.Description>
           </Card.Header>
-          <Card.Content className="flex flex-col gap-2 md:overflow-y-hidden">
+          <Card.Content className="flex flex-col gap-2 px-2 md:overflow-y-hidden">
             <MeasurementForm onSubmit={onFormSubmit} sloperType={sloper} />
             <Button
-              onClick={handleExport}
               className="flex-1 md:hidden"
               intent="neutral"
-              icon={Download}
+              icon={SquareArrowRightExit}
               iconProps={{ size: 18 }}
+              disabled={!result.ok}
+              onClick={handleExportClick}
             >
-              Download
+              Export
             </Button>
           </Card.Content>
         </Card>
         {result.ok && (
           <div className="">
             <Button
-              onClick={handleExport}
-              icon={Download}
+              icon={SquareArrowRightExit}
               intent="neutral"
               className="absolute bottom-2 left-2 hidden md:block"
+              disabled={!result.ok}
+              onClick={handleExportClick}
             >
-              Download
+              Export
             </Button>
             <div className="z-10 hidden md:block">
               <Canvas bounds={result.data.bounds} ref={svgRef}>
@@ -111,6 +115,14 @@ const BodicePage = () => {
               </Canvas>
             </div>
           </div>
+        )}
+        {result.ok && (
+          <ExportOptionsDialog
+            open={isDialogOpen}
+            onOpenChange={handleCloseExportDialog}
+            bounds={result.data.bounds}
+            svgRef={svgRef}
+          />
         )}
       </main>
     </MetaWrapper>

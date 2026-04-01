@@ -1,7 +1,8 @@
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 
-import { pdfSize, type PdfSize } from "./constants";
+import { pdfSize } from "./constants";
+import type { PdfSize } from "./types";
 import { cloneSvg } from "./clone-svg";
 import type { Bounds } from "../../core/pattern/drafting/types";
 import { drawAssemblyGuides } from "./draw-assembly-guides";
