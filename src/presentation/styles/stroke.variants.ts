@@ -32,7 +32,7 @@ export const getStrokeVariant = (role: Role) => {
       return {
         ...common,
         strokeDasharray: "0.3",
-        stroke: "#d6d3d1", // css variants and oklch don't work here. this is --color-neutral
+        stroke: "#d6d3d1", // css variants and oklch don't work here. this is --color-neutral-light
       };
     default:
       return { ...common, stroke: "black" };

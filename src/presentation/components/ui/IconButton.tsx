@@ -33,6 +33,7 @@ export const IconButton = <T extends ElementType = "button">(
       {...rest}
     >
       <Icon {...iconProps} />
+      <span className="sr-only">{rest["aria-label"]}</span>
     </Component>
   );
 };
