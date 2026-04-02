@@ -11,23 +11,30 @@ import {
 } from "react-hook-form";
 
 import { ConditionalWrap } from "../layout/ConditionalWrap";
+import { cn } from "../../lib/cn";
 
 export const FormField = ({ children }: { children?: ReactNode }) => {
   return <div className="flex flex-col gap-1">{children}</div>;
 };
 
-export interface InputProps<
-  T extends FieldValues,
-> extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps<T extends FieldValues> extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "size"
+> {
   register: UseFormRegister<T>;
   name: Path<T>;
+  size?: "sm" | "default";
 }
 
 export const Input = <T extends FieldValues>(props: InputProps<T>) => {
-  const { register, name, ...rest } = props;
+  const { register, name, className, size = "default", ...rest } = props;
   return (
     <input
-      className="bg-background focus:ring-primary appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:ring focus:outline-none"
+      data-size={size}
+      className={cn(
+        "bg-background focus:ring-primary appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:ring focus:outline-none data-[size=default]:h-9 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)]",
+        className,
+      )}
       {...register(name)}
       {...rest}
     />
@@ -39,7 +46,7 @@ interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
 }
 
 const Label = (props: LabelProps) => {
-  const { required = true, ...rest } = props;
+  const { required = true, className, ...rest } = props;
   return (
     <ConditionalWrap
       condition={required}
@@ -55,7 +62,10 @@ const Label = (props: LabelProps) => {
         </div>
       )}
     >
-      <label className="block w-fit text-sm font-bold" {...rest} />
+      <label
+        className={cn("block w-fit text-sm font-bold", className)}
+        {...rest}
+      />
     </ConditionalWrap>
   );
 };

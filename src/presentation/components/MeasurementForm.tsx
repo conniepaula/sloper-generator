@@ -54,7 +54,7 @@ export const MeasurementForm = <T extends FieldValues>(
     <FormProvider {...methods}>
       <Form
         onSubmit={handleFormSubmit}
-        className="flex flex-col gap-6 md:overflow-y-hidden"
+        className="flex flex-col gap-6 px-2 md:overflow-y-hidden"
       >
         <div className="flex flex-1 flex-col gap-2 md:overflow-y-scroll">
           {typedEntries(shape).map(([id, opts]) => {
@@ -71,8 +71,10 @@ export const MeasurementForm = <T extends FieldValues>(
                     >
                       <IconButton
                         icon={Info}
-                        iconProps={{ size: 18, className: "text-gray-700" }}
+                        iconProps={{ className: "w-4 h-4" }}
                         aria-label={`More information on how to measure ${title}`}
+                        className="cursor-auto"
+                        size="sm"
                         type="button"
                       />
                     </Tooltip>
@@ -100,9 +102,8 @@ export const MeasurementForm = <T extends FieldValues>(
         </div>
         {/*TODO: Fix clipped outline/ring when active*/}
         <Button
-          formAction="submit"
           type="submit"
-          id="submitButton"
+          id="measurementSubmitButton"
           disabled={!isDirty || isSubmitting}
           className="lg:w-32 lg:self-end"
         >
