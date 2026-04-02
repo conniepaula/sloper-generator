@@ -1,4 +1,4 @@
-import { type ReactElement, type RefObject } from "react";
+import { type RefObject } from "react";
 import {
   Controller,
   FormProvider,
@@ -7,7 +7,7 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Download } from "lucide-react";
-import { Field } from "@base-ui/react";
+import { Field, Toast } from "@base-ui/react";
 
 import {
   Dialog,
@@ -32,16 +32,20 @@ import { exportSchema } from "../../application/export/schema";
 import type { ExportSchema } from "../../application/export/types";
 import type { Bounds } from "../../core/pattern/drafting/types";
 import { exportPdf } from "../../application/export/export-pdf";
+import { makeToast } from "../utils/make-toast-factory";
+import type { ToastData } from "./ui/Toast";
 
 interface ExportOptionsDialogProps {
   svgRef: RefObject<SVGSVGElement | null>;
   bounds: Bounds;
   open: boolean;
-  onOpenChange: () => void;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const ExportOptionsDialog = (props: ExportOptionsDialogProps) => {
   const { open, onOpenChange, svgRef, bounds } = props;
+
+  const toastManager = Toast.useToastManager<ToastData>();
 
   const methods = useForm<ExportSchema>({
     resolver: zodResolver(exportSchema),
@@ -54,19 +58,33 @@ export const ExportOptionsDialog = (props: ExportOptionsDialogProps) => {
     control,
   } = methods;
 
-  const handleFormSubmit: SubmitHandler<ExportSchema> = (
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      reset();
+    }
+    onOpenChange(nextOpen);
+  };
+
+  const handleFormSubmit: SubmitHandler<ExportSchema> = async (
     data: ExportSchema,
   ) => {
     const svg = svgRef.current;
     if (!svg) return;
 
-    exportPdf(svg, bounds, { ...data });
-    onOpenChange();
-    reset();
+    const result = await exportPdf(svg, bounds, { ...data });
+    if (result.ok) {
+      handleOpenChange(false);
+      reset();
+    }
+
+    const toast = result.ok
+      ? makeToast({ ok: true, code: "EXPORT_SUCCESSFUL" })
+      : makeToast({ ok: false, code: result.error.code });
+    toastManager.add<ToastData>(toast);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-lg font-bold">
@@ -110,7 +128,7 @@ export const ExportOptionsDialog = (props: ExportOptionsDialogProps) => {
               control={control}
               render={({
                 field: { ref, name, value, onBlur, onChange },
-                fieldState: { invalid, isTouched, isDirty, error },
+                fieldState: { invalid, isTouched, isDirty },
               }) => (
                 <Field.Root
                   name={name}
@@ -138,17 +156,16 @@ export const ExportOptionsDialog = (props: ExportOptionsDialogProps) => {
                     </SelectContent>
                   </Select>
                   <ErrorMessage
-                    errors={error}
+                    errors={errors}
                     name={name}
-                    render={() => (
-                      <FormField.Error>{error?.message}</FormField.Error>
+                    render={({ message }) => (
+                      <FormField.Error>{message}</FormField.Error>
                     )}
                   />
                 </Field.Root>
               )}
             />
             <Button
-              formAction="submit"
               type="submit"
               id="exportSubmitButton"
               disabled={isSubmitting}

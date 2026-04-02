@@ -101,7 +101,6 @@ export const MeasurementForm = <T extends FieldValues>(
         </div>
         {/*TODO: Fix clipped outline/ring when active*/}
         <Button
-          formAction="submit"
           type="submit"
           id="measurementSubmitButton"
           disabled={!isDirty || isSubmitting}

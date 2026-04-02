@@ -1,9 +1,7 @@
-import { Download, SquareArrowRightExit } from "lucide-react";
+import { SquareArrowRightExit } from "lucide-react";
 import { useRef, useState } from "react";
-import { Toaster } from "sonner";
 
 import { draftSloper } from "../../application/draft-sloper";
-import { exportPdf } from "../../application/export/export-pdf";
 import type { SloperType } from "../../core/slopers/registry";
 import { DEFAULT_MEASUREMENTS as m } from "../../slopers/bodice/measurements/defaults";
 import type { BodiceMeasurements } from "../../slopers/bodice/measurements/schema";
@@ -11,12 +9,13 @@ import { MeasurementForm } from "../components/MeasurementForm";
 import { Curve } from "../components/svg/Curve";
 import { Line } from "../components/svg/Line";
 import { Button } from "../components/ui/Button";
-import { ERROR_TOAST_DESCRIPTION, ERROR_TOAST_TITLE } from "../constants";
-import { toast } from "../utils/toast";
 import { Canvas } from "../components/svg/Canvas";
 import { Card } from "../components/ui/Card";
 import { MetaWrapper } from "../components/layout/MetaWrapper";
 import { ExportOptionsDialog } from "../components/ExportOptionsDialog";
+import { Toast } from "@base-ui/react/toast";
+import { makeToast } from "../utils/make-toast-factory";
+import type { ToastData } from "../components/ui/Toast";
 
 interface DraftState {
   measurements: BodiceMeasurements;
@@ -30,6 +29,7 @@ const BodicePage = () => {
     result: draftSloper("bodice", m),
   }));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const toastManager = Toast.useToastManager<ToastData>();
 
   const { result } = draftState;
 
@@ -39,20 +39,18 @@ const BodicePage = () => {
   const onFormSubmit = (data: BodiceMeasurements) => {
     const result = draftSloper(sloper, data);
     setDraftState({ measurements: data, result });
-    if (!result.ok) {
-      toast({
-        title: ERROR_TOAST_TITLE[result.error.code],
-        description: ERROR_TOAST_DESCRIPTION[result.error.code],
-      });
-    }
+    const toast = result.ok
+      ? makeToast({ ok: true, code: "DRAFT_SUCCESSFUL" })
+      : makeToast({ ok: false, code: result.error.code });
+    toastManager.add<ToastData>(toast);
   };
 
   const handleExportClick = () => {
     setIsDialogOpen(true);
   };
 
-  const handleCloseExportDialog = () => {
-    setIsDialogOpen(false);
+  const handleCloseExportDialog = (open: boolean) => {
+    setIsDialogOpen(open);
   };
 
   return (
@@ -61,7 +59,6 @@ const BodicePage = () => {
       description="Enter your measurements to generate a custom bodice block for all your pattern-making needs."
     >
       <main className="flex flex-col items-center justify-center">
-        <Toaster position="bottom-right" />
         <Card className="flex flex-col rounded-none sm:my-2 sm:max-w-md sm:rounded-xl md:absolute md:top-0 md:right-0 md:mr-2 md:h-96 md:w-96 md:overflow-hidden">
           <Card.Header>
             <Card.Title className="text-xl font-bold">
@@ -80,7 +77,7 @@ const BodicePage = () => {
           <Card.Content className="flex flex-col gap-2 px-2 md:overflow-y-hidden">
             <MeasurementForm onSubmit={onFormSubmit} sloperType={sloper} />
             <Button
-              className="flex-1 md:hidden"
+              className="mx-2 flex-1 md:hidden"
               intent="neutral"
               icon={SquareArrowRightExit}
               iconProps={{ size: 18 }}
