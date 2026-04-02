@@ -11,7 +11,7 @@ import {
 } from "react-hook-form";
 
 import { ConditionalWrap } from "../layout/ConditionalWrap";
-import { cn } from "../../utils/cn";
+import { cn } from "../../lib/cn";
 
 export const FormField = ({ children }: { children?: ReactNode }) => {
   return <div className="flex flex-col gap-1">{children}</div>;
