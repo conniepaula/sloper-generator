@@ -5,6 +5,7 @@ import {
   iconButton,
   type IconButtonVariants,
 } from "../../styles/button.variants";
+import { cn } from "../../lib/cn";
 
 interface IconButtonOwnProps extends IconButtonVariants {
   icon: LucideIcon;
@@ -24,16 +25,17 @@ export const IconButton = <T extends ElementType = "button">(
 ) => {
   const {
     icon: Icon,
-    iconProps = { size: 18 },
+    iconProps = { className: "" },
     as: Component = "button",
     className,
     intent,
     size,
     ...rest
   } = props;
+  const { className: iconClassName, ...iconRest } = iconProps;
   return (
     <Component className={iconButton({ intent, size }, className)} {...rest}>
-      <Icon {...iconProps} />
+      <Icon className={cn("h-5 w-5 shrink-0", iconClassName)} {...iconRest} />
       <span className="sr-only">{rest["aria-label"]}</span>
     </Component>
   );

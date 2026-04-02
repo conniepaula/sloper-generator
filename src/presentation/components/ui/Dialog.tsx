@@ -5,6 +5,7 @@ import { XIcon } from "lucide-react";
 import { cn } from "../../lib/cn";
 import { Button } from "./Button";
 import { IconButton } from "./IconButton";
+import { size } from "zod";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -63,8 +64,9 @@ function DialogContent({
             data-slot="dialog-close"
             render={
               <IconButton
-                intent="neutral"
+                intent="ghost"
                 icon={XIcon}
+                iconProps={{ size: 24 }}
                 aria-label="Close"
                 className="absolute top-2 right-2"
               />

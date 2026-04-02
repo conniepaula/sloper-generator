@@ -71,9 +71,10 @@ export const MeasurementForm = <T extends FieldValues>(
                     >
                       <IconButton
                         icon={Info}
-                        iconProps={{ size: 18, className: "text-gray-700" }}
+                        iconProps={{ className: "w-4 h-4" }}
                         aria-label={`More information on how to measure ${title}`}
                         className="cursor-auto"
+                        size="sm"
                         type="button"
                       />
                     </Tooltip>

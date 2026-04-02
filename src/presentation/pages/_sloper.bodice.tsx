@@ -80,7 +80,6 @@ const BodicePage = () => {
               className="mx-2 flex-1 md:hidden"
               intent="neutral"
               icon={SquareArrowRightExit}
-              iconProps={{ size: 18 }}
               disabled={!result.ok}
               onClick={handleExportClick}
             >
