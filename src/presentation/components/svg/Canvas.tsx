@@ -2,6 +2,7 @@ import { useLayoutEffect, useState } from "react";
 
 import { useCamera, type Pan } from "../../hooks/useCamera";
 import type { Bounds } from "../../../core/pattern/drafting/types";
+import { MarkersProvider } from "./Markers";
 
 interface CanvasProps {
   children: React.ReactNode;
@@ -45,7 +46,10 @@ export const Canvas: React.FC<CanvasProps> = (props: CanvasProps) => {
       onWheel={handlers.onWheel}
       shapeRendering="geometricPrecision"
     >
-      <g transform={transform}>{children}</g>
+      <g transform={transform}>
+        <MarkersProvider />
+        {children}
+      </g>
     </svg>
   );
 };

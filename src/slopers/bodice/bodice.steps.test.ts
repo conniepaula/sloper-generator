@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+
 import { createBodiceDraftContext } from "./bodice.context";
-import { MOCK_MEASUREMENTS } from "./bodice.constants";
+import { DEFAULT_MEASUREMENTS } from "./measurements/defaults";
 import {
   draftBaseBack,
   draftBaseFront,
@@ -14,7 +15,7 @@ import {
 // TODO: Finish testing all lines
 describe("testing bodice steps", () => {
   // create context
-  const ctx = createBodiceDraftContext(MOCK_MEASUREMENTS);
+  const ctx = createBodiceDraftContext(DEFAULT_MEASUREMENTS);
 
   it("draftBaseFront: creates base front points and construction lines", () => {
     draftBaseFront(ctx);

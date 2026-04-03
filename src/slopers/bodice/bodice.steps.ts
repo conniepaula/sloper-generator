@@ -3,6 +3,7 @@ import {
   translatePoint,
   curvePoints,
   midPoint,
+  lineLength,
 } from "../../geometry/helpers";
 import { AxisEnumMap } from "../../geometry/types";
 
@@ -24,7 +25,11 @@ import {
   unfoldBustDart,
   waistLineLength,
 } from "./bodice.helpers";
-import { addCurve, addLine } from "../../core/pattern/drafting/helpers";
+import {
+  addAnnotation,
+  addCurve,
+  addLine,
+} from "../../core/pattern/drafting/helpers";
 
 // DRAFTING STEPS - FRONT BODICE
 
@@ -759,5 +764,30 @@ export const draftArmholeBack = (ctx: BodiceDraftContext) => {
   addCurve(ctx, "back", "armholeDepthToArmscye", armholeDepthToArmscye, {
     name: "Armhole: Segment 2",
     role: "main_outer",
+  });
+};
+
+export const drawFoldSymbols = (ctx: BodiceDraftContext) => {
+  const { points, lines } = ctx;
+  const foldSymbolWidth =
+    lineLength(lines.front_waistCenterToRightDartLeg.geometry) * 0.3;
+  const foldSymbolHeight = lineLength(lines.front_centerFront.geometry) * 0.2;
+
+  addAnnotation(ctx, "front", "cutOnFold", {
+    type: "cut_on_fold",
+    shape: {
+      startPoint: points.front_centerArmscye,
+      width: foldSymbolWidth,
+      height: foldSymbolHeight,
+    },
+  });
+
+  addAnnotation(ctx, "back", "cutOnFold", {
+    type: "cut_on_fold",
+    shape: {
+      startPoint: points.front_centerArmscye,
+      width: foldSymbolWidth,
+      height: foldSymbolHeight,
+    },
   });
 };

@@ -23,6 +23,8 @@ export type Range = {
   max: number;
 };
 
+export type Axis = "x" | "y";
+
 export interface Intersection {
   /**
    * Computes the intersection of two line segments.
@@ -62,8 +64,6 @@ export type CubicBezier = {
 export type BezierPath = {
   segments: Array<CubicBezier>;
 };
-
-type Axis = "x" | "y";
 
 export const AxisEnumMap = {
   HORIZONTAL: "x",

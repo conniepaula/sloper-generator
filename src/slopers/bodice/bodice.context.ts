@@ -1,4 +1,5 @@
 import type {
+  AnnotationsRecord,
   BodiceDraftContext,
   CurvesRecord,
   LinesRecord,
@@ -13,4 +14,5 @@ export const createBodiceDraftContext = (
   points: {} as PointsRecord,
   lines: {} as LinesRecord,
   curves: {} as CurvesRecord,
+  annotations: {} as AnnotationsRecord,
 });

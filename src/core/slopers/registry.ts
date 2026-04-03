@@ -1,5 +1,5 @@
-import { MOCK_MEASUREMENTS } from "../../slopers/bodice/bodice.constants";
 import type { BodiceDraftContext } from "../../slopers/bodice/bodice.context.types";
+import { DEFAULT_MEASUREMENTS } from "../../slopers/bodice/measurements/defaults";
 import {
   bodiceMeasurementsSchema,
   type BodiceMeasurements,
@@ -10,7 +10,10 @@ export type SloperContextMap = { bodice: BodiceDraftContext };
 export type SloperType = keyof SloperMeasurementsMap;
 
 export const measurementSchemaBySloper = {
-  bodice: { schema: bodiceMeasurementsSchema, defaultValue: MOCK_MEASUREMENTS },
+  bodice: {
+    schema: bodiceMeasurementsSchema,
+    defaultValue: DEFAULT_MEASUREMENTS,
+  },
 };
 
 export const getMeasurementsSchema = (sloperType: SloperType) => {

@@ -77,13 +77,17 @@ type BodiceCurves =
   | "back_neckline"
   | "back_armholeDepthToArmscye";
 
+type BodiceAnnotations = "front_cutOnFold" | "back_cutOnFold";
+
 export type BodiceDraftContext = PatternDraftingContextBase<
   BodiceMeasurements,
   BodicePoints,
   BodiceLines,
-  BodiceCurves
+  BodiceCurves,
+  BodiceAnnotations
 >;
 
 export type PointsRecord = BodiceDraftContext["points"];
 export type LinesRecord = BodiceDraftContext["lines"];
 export type CurvesRecord = BodiceDraftContext["curves"];
+export type AnnotationsRecord = BodiceDraftContext["annotations"];

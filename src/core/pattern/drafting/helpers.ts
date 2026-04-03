@@ -1,14 +1,8 @@
 import { DomainError } from "../../errors";
-import {
-  getBoundingBoxFromLines,
-  lineLength,
-  translateCurve,
-  translateLine,
-} from "../../../geometry/helpers";
+import { lineLength } from "../../../geometry/helpers";
 import type { CubicBezier, Line } from "../../../geometry/types";
 import type {
   PatternCurve,
-  Entity,
   PatternLine,
   Piece,
   Role,
@@ -16,9 +10,9 @@ import type {
   WithoutPiecePrefix,
 } from "./types";
 import type { SloperType } from "../../slopers/registry";
-import { assertNonEmpty } from "../../../shared/utils/assert";
+import type { AnnotationBase, PatternAnnotation } from "./annotations/types";
 
-// TODO: Once aanchor points can be altered, separate line and curve options
+// TODO: Once anchor points can be altered, separate line and curve options
 type AddOptions = {
   role?: Role;
   name?: string;
@@ -78,70 +72,22 @@ export const addCurve = <
   ctx.curves[specificPieceId] = { geometry, role, piece, name };
 };
 
-/** Extracts line geometries from a collection of pattern entities.
- *
- * @param entities Array of pattern entities (lines and curves).
- * @returns Array of Line geometries, excluding curves.
- */
-export const extractLines = (entities: Array<Entity>): Array<Line> => {
-  return entities.filter((e) => e.kind === "line").map((e) => e.geometry);
-};
-
-/**
- * Extracts exportable line geometries from a collection of pattern entities.
- *
- * Only includes lines that have the `exportable` property set to true.
- *
- * @param entities Array of pattern entities (lines and curves).
- * @returns Array of Line geometries marked as exportable.
- */
-export const extractExportableLines = (entities: Array<Entity>): Line[] => {
-  return entities
-    .filter(
-      (entity): entity is Extract<Entity, { kind: "line" }> =>
-        entity.exportable && entity.kind === "line",
-    )
-    .map((entity) => entity.geometry);
-};
-
-/**
- * Computes bounds for an array of entities.
- *
- * Currently, it only takes exportable lines into account.
- */
-export const computeBounds = (entities: Array<Entity>) => {
-  // get lines from all entities
-  const lines = extractExportableLines(entities);
-
-  assertNonEmpty(
-    lines,
-    "Invariant violated: entities array has no exportable lines.",
-  );
-
-  return getBoundingBoxFromLines(lines);
-};
-
-/**
- * Translates a pattern entity (line or curve) by given distances.
- *
- * Preserves all metadata (role, piece, name, etc.) while updating
- * the geometric coordinates.
- *
- * @param entity The pattern entity to translate.
- * @param dx The horizontal translation distance (default: 0).
- * @param dy The vertical translation distance (default: 0).
- * @returns A new entity with translated geometry.
- */
-export const translateEntity = (
-  entity: Entity,
-  dx: number = 0,
-  dy: number = 0,
-): Entity => {
-  if (entity.kind === "line") {
-    return { ...entity, geometry: translateLine(entity.geometry, dx, dy) };
-  }
-  // entity is curve
-  return { ...entity, geometry: translateCurve(entity.geometry, dx, dy) };
+export const addAnnotation = <
+  TPatternContext extends {
+    annotations: Record<string, PatternAnnotation>;
+  },
+  TPiece extends Piece,
+>(
+  ctx: TPatternContext,
+  piece: TPiece,
+  id: WithoutPiecePrefix<
+    Extract<keyof TPatternContext["annotations"], string>,
+    TPiece
+  >,
+  annotation: AnnotationBase,
+) => {
+  const specificPieceId = `${piece}_${id}`;
+  ctx.annotations[specificPieceId] = { ...annotation, piece };
 };
 
 /**

@@ -1,12 +1,13 @@
 import { getBoundingBoxMetrics } from "../../../geometry/helpers";
-import { computeBounds, translateEntity } from "../drafting/helpers";
 import type { PatternDocument, PatternLayout } from "../drafting/types";
+import { computeBounds, translateAnnotation, translateEntity } from "./helpers";
 
 export const composePatternLayout = (
   document: PatternDocument,
   spacing: number,
 ): PatternLayout => {
   const { front, back } = document.entities;
+  const { front: fAnnotations, back: bAnnotations } = document.annotations;
 
   // get front bounding box
   const frontBbox = computeBounds(front);
@@ -21,17 +22,23 @@ export const composePatternLayout = (
     translateEntity(backEntity, xOffset, yOffset),
   );
 
+  const translatedBAnnotations = bAnnotations.map((backAnnotation) =>
+    translateAnnotation(backAnnotation, xOffset, yOffset),
+  );
+
   // get translatedBack bounding box
   const backBbox = computeBounds(translatedBack);
   const backBboxMetrics = getBoundingBoxMetrics(backBbox);
 
   // get full layout bounding box
   const layoutEntities = [...front, ...translatedBack];
+  const layoutAnnotations = [...fAnnotations, ...translatedBAnnotations];
   const layoutBbox = computeBounds(layoutEntities);
   const layoutBboxMetrics = getBoundingBoxMetrics(layoutBbox);
 
   return {
     entities: layoutEntities,
+    annotations: layoutAnnotations,
     bounds: { ...layoutBbox, ...layoutBboxMetrics },
     perPiece: {
       front: {

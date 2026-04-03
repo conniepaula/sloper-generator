@@ -28,8 +28,6 @@ export const vectorFrom = (point1: Point, point2: Point): Vector => {
   return { x: dx, y: dy };
 };
 
-vectorFrom("hello", "hello");
-
 /**
  * Computes the magnitude (length) of a vector.
  *
