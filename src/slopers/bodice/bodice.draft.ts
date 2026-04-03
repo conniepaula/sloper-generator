@@ -15,6 +15,7 @@ import {
   draftSideSeamBack,
   draftWaistBack,
   draftWaistFront,
+  drawFoldSymbols,
 } from "./bodice.steps";
 import { walkSeams } from "../../core/pattern/drafting/helpers";
 import { DomainError, InvariantError, type Result } from "../../core/errors";
@@ -73,7 +74,7 @@ export const draftBodice = (
           "Bodice front and back shoulder lengths are different. Check your measurements.",
       },
     );
-
+    drawFoldSymbols(ctx);
     return Ok(ctx);
   } catch (err) {
     return Err(

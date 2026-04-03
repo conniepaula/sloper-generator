@@ -5,9 +5,15 @@ import type {
   Line,
   // Point
 } from "../../../geometry/types";
+import type { Annotations, DocumentAnnotations } from "./annotations/types";
 
 export type Piece = "front" | "back";
-export type Role = "main_outer" | "main_inner" | "guide" | "construction";
+export type Role =
+  | "main_outer"
+  | "main_inner"
+  | "guide"
+  | "construction"
+  | "annotation";
 export type Seam = Line | Array<Line>;
 
 interface GeometryWrapper {
@@ -50,7 +56,10 @@ export type Entities = Array<Entity>;
 
 export type DocumentEntities = Record<Piece, Entities>;
 
-export type PatternDocument = { entities: DocumentEntities };
+export type PatternDocument = {
+  entities: DocumentEntities;
+  annotations: DocumentAnnotations;
+};
 
 export type Bounds = BoundingBox & BoundingBoxMetrics;
 
@@ -60,7 +69,8 @@ type PerPieceProps = {
 };
 
 export interface PatternLayout {
-  entities: Array<Entity>;
+  entities: Entities;
+  annotations: Annotations;
   bounds: Bounds;
   perPiece: Record<Piece, PerPieceProps>;
 }

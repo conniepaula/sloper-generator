@@ -16,6 +16,7 @@ import { ExportOptionsDialog } from "../components/ExportOptionsDialog";
 import { Toast } from "@base-ui/react/toast";
 import { makeToast } from "../utils/make-toast-factory";
 import type { ToastData } from "../components/ui/Toast";
+import { Annotation } from "../components/svg/Annotation";
 
 interface DraftState {
   measurements: BodiceMeasurements;
@@ -103,11 +104,18 @@ const BodicePage = () => {
                 {result.data.entities.map(({ id, kind, geometry, role }) => {
                   switch (kind) {
                     case "line":
-                      return <Line key={id} role={role} {...geometry} />;
+                      return (
+                        <Line key={id} id={id} role={role} {...geometry} />
+                      );
                     case "curve":
-                      return <Curve key={id} role={role} {...geometry} />;
+                      return (
+                        <Curve key={id} id={id} role={role} {...geometry} />
+                      );
                   }
                 })}
+                {result.data.annotations.map((annotation) => (
+                  <Annotation key={annotation.id} annotation={annotation} />
+                ))}
               </Canvas>
             </div>
           </div>
